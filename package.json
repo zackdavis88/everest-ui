@@ -4,7 +4,7 @@
   "description": "Web app for managing application content",
   "main": "index.js",
   "scripts": {
-    "dev": "next dev",
+    "dev": "node server.js",
     "build": "next build",
     "start": "next start"
   },

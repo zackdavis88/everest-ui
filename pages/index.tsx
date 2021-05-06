@@ -1,5 +1,5 @@
-import Head from 'next/head'
-import { GetServerSideProps } from 'next'
+import Head from "next/head";
+import { GetServerSideProps } from "next";
 
 export const getServerSideProps: GetServerSideProps = async context => {
   return {
@@ -12,5 +12,5 @@ export default function Home(props) {
     <div>
       Hello, World!
     </div>
-  )
+  );
 };
