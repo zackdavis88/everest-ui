@@ -1,16 +1,26 @@
 import Head from "next/head";
 import { GetServerSideProps } from "next";
+import { initializeStore } from "../src/store/store";
 
 export const getServerSideProps: GetServerSideProps = async context => {
+  const reduxStore = initializeStore();
+
   return {
-    props: {}
+    props: {
+      initialReduxState: reduxStore.getState()
+    }
   };
 };
 
 export default function Home(props) {
   return (
-    <div>
-      Hello, World!
-    </div>
+    <>
+      <Head>
+        <title>Index Page</title>
+      </Head>
+      <div>
+        Hello, World!
+      </div>
+    </>
   );
 };
