@@ -38,6 +38,11 @@ export default function authReducer(state=initialState, action) {
         ...initialState,
         token: null
       };
+    case "DEBUG":
+      return {
+        ...state,
+        message: "Serverside rendered"
+      };
     default:
       return state;
   }
