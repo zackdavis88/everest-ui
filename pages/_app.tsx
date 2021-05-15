@@ -4,6 +4,7 @@ import { ThemeProvider } from "@material-ui/core/styles";
 import { Provider } from "react-redux";
 import theme from "../src/theme";
 import {useStore} from "../src/store/store";
+import Navbar from "../src/components/Navbar/Navbar";
 
 export default function App({ Component, pageProps }: AppProps) {
   const store = useStore(pageProps.initialReduxState);
@@ -12,6 +13,7 @@ export default function App({ Component, pageProps }: AppProps) {
     <Provider store={store}>
       <CssBaseline />
       <ThemeProvider theme={theme}>
+        <Navbar />
         <Component {...pageProps} />
       </ThemeProvider>
     </Provider>
