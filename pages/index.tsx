@@ -3,6 +3,7 @@ import Link from "next/link";
 import { GetServerSideProps } from "next";
 import { connect } from "react-redux";
 import { getAuthToken } from "../src/utils";
+import { RootState } from "../src/store/store";
 
 function Index(props) {
   return (
@@ -26,6 +27,6 @@ function Index(props) {
 
 export const getServerSideProps: GetServerSideProps = getAuthToken;
 
-export default connect((state) => ({
-  auth: state["auth"]
+export default connect((state: RootState) => ({
+  auth: state.auth
 }), {})(Index);

@@ -1,6 +1,6 @@
 import Head from "next/head";
 import Link from "next/link";
-import { initializeStore } from "../src/store/store";
+import { initializeStore, RootState } from "../src/store/store";
 import { connect } from "react-redux";
 import { GetServerSideProps } from "next";
 import { isServerReq } from "../src/utils";
@@ -37,8 +37,8 @@ export const getServerSideProps: GetServerSideProps = async context => {
   return {props: {}};
 };
 
-export default connect((state) => ({
-  auth: state["auth"]
+export default connect((state: RootState) => ({
+  auth: state.auth
 }), {
 
 })(Page2);
