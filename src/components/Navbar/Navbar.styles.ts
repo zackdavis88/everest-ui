@@ -4,19 +4,43 @@ export const useStyles = makeStyles((theme) => ({
   toolbar: {
     backgroundColor: "#144E69",
     height: "64px",
+    position: "relative"
   },
-  rootContainer: {
+  gridContainer: {
     height: "100%"
+  },
+  gridItem: {
+    border: "1px solid red"
   },
   brandIcon: {
     "&.fa-mountain": {
-      width: "35px",
-      height: "35px",
-      marginRight: "8px"
+      marginRight: "8px",
+      [theme.breakpoints.up(theme.breakpoints.values.lg)]: {
+        width: "35px",
+        height: "35px"
+      },
+      [theme.breakpoints.down(theme.breakpoints.values.lg)]: {
+        width: "30px",
+        height: "30px"
+      }
     }
   },
   brandText: {
-    display: "inline-block",
-    fontWeight: "bold"
+    width: "100%",
+    display: "block",
+    fontWeight: "bold",
+    lineHeight: "64px",
+    textAlign: "center",
+    [theme.breakpoints.up(theme.breakpoints.values.lg)]: {
+      fontSize: "35px"
+    },
+    [theme.breakpoints.down(theme.breakpoints.values.lg)]: {
+      fontSize: "30px"
+    }
+  },
+  navItem: {
+    fontWeight: "bold",
+    height: "64px",
+    borderRadius: "0"
   }
 }));
