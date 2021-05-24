@@ -41,6 +41,13 @@ export const useStyles = makeStyles((theme) => ({
   navItem: {
     fontWeight: "bold",
     height: "64px",
-    borderRadius: "0"
+    borderRadius: "0",
+    margin: "0 5px",
+    [theme.breakpoints.up(theme.breakpoints.values.lg)]: {
+      fontSize: "14px"
+    },
+    [theme.breakpoints.down(theme.breakpoints.values.lg)]: {
+      fontSize: "12px"
+    }
   }
 }));
