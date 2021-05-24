@@ -9,8 +9,9 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCaretDown, faCaretUp } from "@fortawesome/free-solid-svg-icons";
 import { useStyles } from "./Sidebar.styles";
 import { useRouter } from "next/router";
+import { SidebarProps } from "./Sidebar.props";
 
-const Sidebar = (props) => {
+const Sidebar = (props: SidebarProps) => {
   const classes = useStyles(props);
   const [openSubMenu, setOpenSubMenu] = useState(null);
   const router = useRouter();
@@ -29,7 +30,7 @@ const Sidebar = (props) => {
       if(navItem.url)
         router.push(navItem.url);
       props.closeSidebar();
-    }
+    };
     return (
       <ListItem button className={classes.menuItem} onClick={onClick}>
         <ListItemText primary={navItem.name.toUpperCase()} inset={inset} />
@@ -59,17 +60,15 @@ const Sidebar = (props) => {
   return (
     <Drawer open={props.isOpen} onClose={props.onClose} classes={{root: classes.drawerRoot, paper: classes.drawerPaper}}>
       <List component="nav" className={classes.sidebarMenu} disablePadding>
-        {props.navigationItems.map((navItem, index) => {
-          return (
-            <Fragment key={index}>
-              {navItem.navigationItems && navItem.navigationItems.length ? (
-                renderCollapsibleMenuItem(navItem, index)
-              ) : (
-                renderMenuItem(navItem)
-              )}
-            </Fragment>
-          );
-        })}
+        {props.navigationItems.map((navItem, index) => (
+          <Fragment key={index}>
+            {navItem.navigationItems && navItem.navigationItems.length ? (
+              renderCollapsibleMenuItem(navItem, index)
+            ) : (
+              renderMenuItem(navItem)
+            )}
+          </Fragment>
+        ))}
       </List>
     </Drawer>
   );

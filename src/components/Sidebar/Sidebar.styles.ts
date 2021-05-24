@@ -15,7 +15,7 @@ export const useStyles = makeStyles((theme) => ({
     whiteSpace: "nowrap",
     width: "240px",
     background: "#144E69",
-    padding: "25px 15px",
+    padding: "15px",
     fontSize: "0.875rem",
     color: "#FFFFFF"
   },
