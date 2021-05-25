@@ -6,15 +6,16 @@ import Typography from "@material-ui/core/Typography";
 import Button from "@material-ui/core/Button";
 import IconButton from "@material-ui/core/IconButton";
 import Hidden from "@material-ui/core/Hidden";
-import { faMountain, faBars } from "@fortawesome/free-solid-svg-icons";
+import { faMountain, faBars, faKey, faSignOutAlt, faCaretDown } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { connect } from "react-redux";
 import { useStyles } from "./Navbar.styles";
 import { RootState } from "../../store/store";
 import Link from "next/link";
 import Sidebar from "../Sidebar/Sidebar";
+import Menu from "../Menu/Menu";
 
-function Navbar() {
+function Navbar(props) {
   const classes = useStyles();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
@@ -42,6 +43,23 @@ function Navbar() {
     url: "/page2"
   }];
 
+  const userMenuProps = {
+    id: "navbar-user-menu",
+    menuName: props.user && props.user.displayName || "booya",
+    menuItems: [{
+      name: "Change Password",
+      startIcon: <FontAwesomeIcon icon={faKey}/>,
+      onClick: () => {
+        console.log("Change Password");
+      }
+    }, {
+      name: "Sign Out",
+      startIcon: <FontAwesomeIcon icon={faSignOutAlt}/>,
+      onClick: () => console.log("Logout")
+    }],
+    endIcon: <FontAwesomeIcon icon={faCaretDown} />
+  };
+
   const sidebarProps = {
     isOpen: sidebarOpen,
     onClose: toggleSidebar(false),
@@ -49,13 +67,7 @@ function Navbar() {
       ...navigationItems,
       {
         name: "My Account",
-        navigationItems: [{
-          name: "Change Password",
-          onClick: () => console.log("Change Password Clicked!")
-        }, {
-          name: "Logout",
-          onClick: () => console.log("Logout Clicked!")
-        }]
+        navigationItems: [...userMenuProps.menuItems]
       }
     ],
     closeSidebar: () => setSidebarOpen(false)
@@ -85,7 +97,13 @@ function Navbar() {
       </Hidden>
     </>
   );
-
+  
+  const renderUserMenu = () => (
+    <Hidden implementation="css" smDown>
+      <Menu {...userMenuProps} />
+    </Hidden>
+  );
+  
   return (
     <AppBar position="static">
       <Toolbar className={classes.toolbar} disableGutters>
@@ -97,7 +115,7 @@ function Navbar() {
             {renderBranding()}
           </Grid>
           <Grid item xs={2} sm={4} lg={4} className={classes.gridItem}>
-            booya
+            {renderUserMenu()}
           </Grid>
         </Grid>
       </Toolbar>

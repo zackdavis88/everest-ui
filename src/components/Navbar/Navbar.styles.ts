@@ -10,7 +10,18 @@ export const useStyles = makeStyles((theme) => ({
     height: "100%"
   },
   gridItem: {
-    border: "1px solid red"
+    "& #navbar-user-menu": {
+      textAlign: "right",
+      margin: "0 13px",
+      "& .MuiButton-root": {
+        [theme.breakpoints.up(theme.breakpoints.values.lg)]: {
+          fontSize: "14px"
+        },
+        [theme.breakpoints.down(theme.breakpoints.values.lg)]: {
+          fontSize: "12px"
+        }
+      }
+    }
   },
   brandIcon: {
     "&.fa-mountain": {
