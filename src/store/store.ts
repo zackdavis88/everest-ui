@@ -50,3 +50,5 @@ export function useStore(initialState) {
   const store = useMemo(() => initializeStore(initialState), [initialState]);
   return store;
 };
+
+export type RootState = ReturnType<typeof store.getState>
