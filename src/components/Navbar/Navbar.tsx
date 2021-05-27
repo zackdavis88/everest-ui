@@ -105,7 +105,7 @@ function Navbar(props) {
   );
   
   return (
-    <AppBar position="static">
+    <AppBar position="static" color="primary">
       <Toolbar className={classes.toolbar} disableGutters>
         <Grid container alignItems="center" justify="center" className={classes.gridContainer}>
           <Grid item xs={2} sm={4} lg={4} className={classes.gridItem}>

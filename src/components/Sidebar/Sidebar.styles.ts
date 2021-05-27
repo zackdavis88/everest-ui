@@ -7,14 +7,11 @@ export const useStyles = makeStyles((theme) => ({
   menuItem: {
     width: "100%"
   },
-  menuItemIcon: {
-    color: '#97c05c',
-  },
   drawerPaper: {
     position: "relative",
     whiteSpace: "nowrap",
     width: "240px",
-    background: "#144E69",
+    background: theme.palette.primary.main,
     padding: "15px",
     fontSize: "0.875rem",
     color: "#FFFFFF"
