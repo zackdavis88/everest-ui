@@ -20,7 +20,8 @@ export default function authReducer(state=initialState, action) {
         isLoading: true
       };
     case TOKEN_SUCCESS:
-      // localStorage.setItem("token", action.response.headers["x-everest-token"]);
+      if(typeof document === "object")
+        document.cookie = `token=${action.response.headers["x-everest-token"]}`
       return {
         isLoading: false,
         message: action.response.body.message,
@@ -33,15 +34,10 @@ export default function authReducer(state=initialState, action) {
         isLoading: false
       };
     case LOGOUT:
-      // localStorage.removeItem("token");
+      // TODO: Delete the cookie.
       return {
         ...initialState,
         token: null
-      };
-    case "DEBUG":
-      return {
-        ...state,
-        message: "Serverside rendered"
       };
     default:
       return state;

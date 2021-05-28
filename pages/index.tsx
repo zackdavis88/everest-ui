@@ -14,6 +14,13 @@ import { getAuthToken } from "../src/utils";
 import { RootState } from "../src/store/store";
 import { faSignInAlt, faUserPlus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { authenticate } from "../src/store/actions/auth";
+
+interface IndexProps {
+  initialReduxState: RootState;
+  auth: any;
+  authenticate: any;
+};
 
 const useStyles = makeStyles(theme => ({
   container: {
@@ -37,9 +44,6 @@ const useStyles = makeStyles(theme => ({
   form: {
     padding: "16px 0"
   },
-  textField: {
-
-  },
   usernameField: {
     margin: "0"
   },
@@ -51,21 +55,30 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-function Index(props) {
+function Index(props: IndexProps) {
   const classes = useStyles();
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
   const usernameField = {
     id: "username-input",
     type: "text",
     label: "Username",
-    className: `${classes.textField} ${classes.usernameField}`,
-    fullWidth: true
+    className: classes.usernameField,
+    fullWidth: true,
+    value: username,
+    onChange: (event) => setUsername(event.target.value)
   };
   const passwordField = {
     id: "password-input",
     type: "password",
     label: "Password",
-    className: `${classes.textField} ${classes.passwordField}`,
-    fullWidth: true
+    className: classes.passwordField,
+    fullWidth: true,
+    value: password,
+    onChange: (event) => setPassword(event.target.value)
+  };
+  const onSubmit = async() => {
+    const response = await props.authenticate(username, password);
   };
   return (
     <>
@@ -87,7 +100,7 @@ function Index(props) {
             <TextField variant="filled" {...passwordField} />
             <Grid container spacing={2} justify="center">
             <Grid item xs={12} sm={6}>
-            <Button className={classes.button} variant="contained" size="large" fullWidth color="primary" startIcon={<FontAwesomeIcon icon={faSignInAlt} size="sm" fixedWidth />}>
+            <Button className={classes.button} variant="contained" size="large" fullWidth color="primary" onClick={onSubmit} startIcon={<FontAwesomeIcon icon={faSignInAlt} fixedWidth />}>
               Login
             </Button>
             </Grid>
@@ -108,4 +121,6 @@ export const getServerSideProps: GetServerSideProps = getAuthToken;
 
 export default connect((state: RootState) => ({
   auth: state.auth
-}), {})(Index);
+}), {
+  authenticate
+})(Index);
