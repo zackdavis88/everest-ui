@@ -1,6 +1,7 @@
 import {useTheme, useMediaQuery} from "@material-ui/core";
 import {initializeStore} from "./store/store";
 import cookie from "cookie";
+import apiConfig from "../config/api.json";
 
 // This is a hack to detect if we are calling getServerSideProps on the server.
 // For some reason getServerSideProps is called everytime a page loads even if its
@@ -8,26 +9,28 @@ import cookie from "cookie";
 // ...should I consider another framework that handles serverside rendering?
 export const isServerReq = req => !req.url.startsWith('/_next');
 
-
-// TODO: THis is where you left off. Made good progress and are successfully authenticating and populating the initalStore.
-// Refine this and make sure the success / failure flows are working. Keep going from there.
 export const getAuthToken = async context => {
-  if(isServerReq(context.req)){
-    const cookies = cookie.parse(context.req.headers.cookie);
-    const reduxStore = initializeStore();
-    const res = await fetch(`http://localhost:3333/auth/token`, {headers: {"x-everest-token": cookies.token}});
+  // If this is a client side request, return no initial props.
+  if(!isServerReq(context.req))
+    return {props: {}};
+
+  const cookies = cookie.parse(context.req.headers.cookie || "");
+  const reduxStore = initializeStore();
+  if(cookies.token){
+    const res = await fetch(`${apiConfig.host}:${apiConfig.port}/auth/token`, {headers: {"x-everest-token": cookies.token}});
     const body = await res.json();
-    reduxStore.dispatch({
-      type: "TOKEN_SUCCESS",
-      response: { body, headers: {"x-everest-token": cookies.token} }
-    });
-    return {
-      props: {
-        initialReduxState: reduxStore.getState()
-      }
-    };
+    if(res.status === 200){
+      await reduxStore.dispatch({
+        type: "TOKEN_SUCCESS",
+        response: {body, headers: {"x-everest-token": cookies.token}}
+      });
+    }
   }
-  return {props: {}};
+  return {
+    props: {
+      initialReduxState: reduxStore.getState()
+    }
+  };
 };
 
 
