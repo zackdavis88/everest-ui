@@ -1,8 +1,7 @@
 import {
   TOKEN_REQUEST,
   TOKEN_SUCCESS,
-  TOKEN_FAILURE,
-  LOGOUT
+  TOKEN_FAILURE
 } from "../actions/auth";
 
 const initialState = {
@@ -29,15 +28,10 @@ export default function authReducer(state=initialState, action) {
         token: action.response.headers["x-everest-token"]
       };
     case TOKEN_FAILURE:
+      if(typeof document === "object")
+        document.cookie = `token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/`; // expire the cookie to delete.
       return {
-        ...state,
-        isLoading: false
-      };
-    case LOGOUT:
-      // TODO: Delete the cookie.
-      return {
-        ...initialState,
-        token: null
+        ...initialState
       };
     default:
       return state;
