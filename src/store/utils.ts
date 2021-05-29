@@ -8,7 +8,6 @@ export const apiMiddleware = store => next => action => {
   const [REQUEST_TYPE, SUCCESS_TYPE, FAILURE_TYPE] = types;
   const authToken = store.getState().auth.token;
   if(authToken){
-    // request.set("x-everest-token", authToken);
     options = {
       ...options,
       headers: {
@@ -19,7 +18,6 @@ export const apiMiddleware = store => next => action => {
   }
   
   if(payload){
-    // request.send(payload);
     options = {
       ...options,
       body: JSON.stringify(payload)
