@@ -11,6 +11,7 @@ import useTheme from "@material-ui/core/styles/useTheme";
 import useMediaQuery from "@material-ui/core/useMediaQuery";
 import makeStyles from "@material-ui/core/styles/makeStyles";
 import CircularProgress from "@material-ui/core/CircularProgress";
+import { showNotification } from "./store/actions/notification";
 
 // This is a hack to detect if we are calling getServerSideProps on the server.
 // For some reason getServerSideProps is called everytime a page loads even if its
@@ -64,6 +65,7 @@ export const requireAuth = (PageComponent) => {
   interface AuthControllerProps{
     initialReduxState?: RootState;
     token?: string;
+    showNotification: (message: string, type?: string, autoClose?: boolean) => void;
   };
 
   const useStyles = makeStyles((theme) => ({
@@ -87,10 +89,12 @@ export const requireAuth = (PageComponent) => {
     const classes = useStyles();
     const token = props.token;
     useEffect(() => {
-      // TODO: lets add a notification message here so the user knows why they were redirected.
-      // Also TODO: Build a notification system in redux from scratch.
-      if(!token)
-        router.push("/");
+      if(!token){
+        router.push(`/`).then(() => {
+          const message = "Please login below to use Everest."
+          props.showNotification(message)
+        });
+      }
     }, [token]);
     return (
       <>
@@ -115,5 +119,7 @@ export const requireAuth = (PageComponent) => {
   };
   return connect((state: RootState) => ({
     token: state.auth.token
-  }), {})(AuthController);
+  }), {
+    showNotification
+  })(AuthController);
 };
