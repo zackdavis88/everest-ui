@@ -1,5 +1,6 @@
 import {createMuiTheme} from "@material-ui/core/styles";
 import blue from "@material-ui/core/colors/blue";
+import lightBlue from "@material-ui/core/colors/lightBlue";
 import grey from "@material-ui/core/colors/grey";
 import red from "@material-ui/core/colors/red";
 import green from "@material-ui/core/colors/green";
@@ -25,6 +26,11 @@ const theme = createMuiTheme({
       light: grey["300"],
       main: grey["400"],
       dark: grey["500"]
+    },
+    info: {
+      light: lightBlue["700"],
+      main: lightBlue["800"],
+      dark: lightBlue["900"]
     },
     error: {
       light: red["700"],
