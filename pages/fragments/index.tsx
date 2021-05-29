@@ -19,7 +19,7 @@ import { authenticate } from "../../src/store/actions/auth";
 import { useRouter } from "next/router";
 
 interface FragmentsIndexProps {
-  initialReduxState: RootState;
+  initialReduxState?: RootState;
 };
 
 function FragmentsIndex(props: FragmentsIndexProps) {

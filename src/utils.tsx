@@ -11,6 +11,7 @@ import useTheme from "@material-ui/core/styles/useTheme";
 import useMediaQuery from "@material-ui/core/useMediaQuery";
 import makeStyles from "@material-ui/core/styles/makeStyles";
 import CircularProgress from "@material-ui/core/CircularProgress";
+import { showNotification } from "./store/actions/notification";
 
 // This is a hack to detect if we are calling getServerSideProps on the server.
 // For some reason getServerSideProps is called everytime a page loads even if its
@@ -60,9 +61,11 @@ export const getAuthToken = async context => {
   );
 };
 
-export const requireAuth = (ContainerComponent) => {
+export const requireAuth = (PageComponent) => {
   interface AuthControllerProps{
+    initialReduxState?: RootState;
     token?: string;
+    showNotification: (message: string, type?: string, autoClose?: boolean) => void;
   };
 
   const useStyles = makeStyles((theme) => ({
@@ -75,6 +78,9 @@ export const requireAuth = (ContainerComponent) => {
     text: {
       width: "100%",
       fontWeight: "bold"
+    },
+    marginTop: {
+      margin: "25px 0 0 0"
     }
   }));
 
@@ -83,10 +89,12 @@ export const requireAuth = (ContainerComponent) => {
     const classes = useStyles();
     const token = props.token;
     useEffect(() => {
-      // TODO: lets add a notification message here so the user knows why they were redirected.
-      // Also TODO: Build a notification system in redux from scratch.
-      if(!token)
-        router.push("/");
+      if(!token){
+        router.push(`/?redirectUrl=${router.pathname}`).then(() => {
+          const message = "Please login below to use Everest."
+          props.showNotification(message)
+        });
+      }
     }, [token]);
     return (
       <>
@@ -98,18 +106,20 @@ export const requireAuth = (ContainerComponent) => {
                   Redirecting to Login Page...
                 </Typography>
               </Grid>
-              <Grid item xs={12} style={{margin: "25px 0 0 0"}}>
+              <Grid item xs={12} className={classes.marginTop}>
                 <CircularProgress />
               </Grid>
             </Grid>
           </Backdrop>
         ) : (
-          <ContainerComponent />
+          <PageComponent initialReduxState={props.initialReduxState} />
         )}
       </>
     );
   };
   return connect((state: RootState) => ({
     token: state.auth.token
-  }))(AuthController);
+  }), {
+    showNotification
+  })(AuthController);
 };

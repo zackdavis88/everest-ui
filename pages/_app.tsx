@@ -5,6 +5,7 @@ import { Provider } from "react-redux";
 import theme from "../src/theme";
 import {useStore} from "../src/store/store";
 import Navbar from "../src/components/Navbar/Navbar";
+import Notification from "../src/components/Notification/Notification";
 
 export default function App({ Component, pageProps }: AppProps) {
   const store = useStore(pageProps.initialReduxState);
@@ -14,6 +15,7 @@ export default function App({ Component, pageProps }: AppProps) {
       <CssBaseline />
       <ThemeProvider theme={theme}>
         <Navbar />
+        <Notification />
         <Component {...pageProps} />
       </ThemeProvider>
     </Provider>

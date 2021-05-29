@@ -17,9 +17,10 @@ import { faSignInAlt, faUserPlus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { authenticate } from "../src/store/actions/auth";
 import { useRouter } from "next/router";
+import { UrlObject } from "url";
 
 interface IndexProps {
-  initialReduxState: RootState;
+  initialReduxState?: RootState;
   auth: any;
   authenticate: any;
 };
@@ -106,7 +107,8 @@ function Index(props: IndexProps) {
     
     usernameRef.current.value = "";
     passwordRef.current.value = "";
-    // router.push("/home")
+
+    router.push(router.query.redirectUrl as UrlObject || "/home");
   };
   return (
     <>
