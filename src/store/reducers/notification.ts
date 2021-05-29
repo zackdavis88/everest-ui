@@ -20,7 +20,8 @@ export default function notificationReducer(state=initialState, action) {
       };
     case HIDE_NOTIFICATION:
       return {
-        ...initialState
+        ...state,
+        message: ""
       };
     default:
       return state;
