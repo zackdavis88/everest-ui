@@ -2,6 +2,8 @@ import {useTheme, useMediaQuery} from "@material-ui/core";
 import {initializeStore} from "./store/store";
 import cookie from "cookie";
 import apiConfig from "../config/api.json";
+import React from "react";
+import { connect } from "react-redux";
 
 // This is a hack to detect if we are calling getServerSideProps on the server.
 // For some reason getServerSideProps is called everytime a page loads even if its
@@ -49,4 +51,17 @@ export const getAuthToken = async context => {
       return !output && matches ? key : output;
     }, null) || 'xs'
   );
+};
+
+// TODO: This is where you left off. Build this HOC and make it connect to redux.
+// Have it monitor the auth token in state and if the token goes null then redirect to the login page.
+export const requireAuth = (ContainerComponent) => {
+  const AuthController = (props) => {
+    return (
+      <>
+        <ContainerComponent/>
+      </>
+    );
+  };
+  return connect()(AuthController);
 };
