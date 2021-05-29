@@ -19,7 +19,7 @@ import { authenticate } from "../src/store/actions/auth";
 import { useRouter } from "next/router";
 
 interface IndexProps {
-  initialReduxState: RootState;
+  initialReduxState?: RootState;
   auth: any;
   authenticate: any;
 };

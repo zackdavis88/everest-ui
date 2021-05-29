@@ -11,7 +11,7 @@ import Collapse from "@material-ui/core/Collapse";
 import makeStyles from "@material-ui/core/styles/makeStyles";
 import { GetServerSideProps } from "next";
 import { connect } from "react-redux";
-import { getAuthToken, requireAuth } from "../../src/utils";
+import { getAuthToken, requireAuth, isServerReq } from "../../src/utils";
 import { RootState } from "../../src/store/store";
 import { faSignInAlt, faUserPlus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -19,7 +19,7 @@ import { authenticate } from "../../src/store/actions/auth";
 import { useRouter } from "next/router";
 
 interface ComponentsIndexProps {
-  initialReduxState: RootState;
+  initialReduxState?: RootState;
 };
 
 function ComponentsIndex(props: ComponentsIndexProps) {
@@ -33,8 +33,19 @@ function ComponentsIndex(props: ComponentsIndexProps) {
   );
 };
 
-export const getServerSideProps: GetServerSideProps = getAuthToken;
+export const getServerSideProps: GetServerSideProps = async context => {
+  if(isServerReq(context.req)){
+    const initialAuthProps = await getAuthToken(context);
+    // Potentially fetch more data here, merge it all together and return it.
+    return {props: {...initialAuthProps.props}};
+  }
+  return {props: {}};
+};
 
-const ConnectedComponentsIndex = connect()(ComponentsIndex);
+const ConnectedComponentsIndex = connect(() => ({
+
+}), {
+
+})(ComponentsIndex);
 
 export default requireAuth(ConnectedComponentsIndex);

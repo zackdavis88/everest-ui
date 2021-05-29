@@ -60,8 +60,9 @@ export const getAuthToken = async context => {
   );
 };
 
-export const requireAuth = (ContainerComponent) => {
+export const requireAuth = (PageComponent) => {
   interface AuthControllerProps{
+    initialReduxState?: RootState;
     token?: string;
   };
 
@@ -107,12 +108,12 @@ export const requireAuth = (ContainerComponent) => {
             </Grid>
           </Backdrop>
         ) : (
-          <ContainerComponent />
+          <PageComponent initialReduxState={props.initialReduxState} />
         )}
       </>
     );
   };
   return connect((state: RootState) => ({
     token: state.auth.token
-  }))(AuthController);
+  }), {})(AuthController);
 };
