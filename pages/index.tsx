@@ -106,12 +106,12 @@ function Index(props: IndexProps) {
     
     usernameRef.current.value = "";
     passwordRef.current.value = "";
-    router.push("/wads")
+    // router.push("/home")
   };
   return (
     <>
       <Head>
-        <title>Login Page</title>
+        <title>Everest | Login Page</title>
       </Head>
       <Container maxWidth="sm" className={classes.container}>
         <Box boxShadow={3} borderRadius="10px" className={classes.box} bgcolor="secondary.light">
