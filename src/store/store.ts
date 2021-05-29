@@ -6,11 +6,6 @@ import createRootReducer from "./reducers";
 
 let store;
 
-// const initialState = {
-//   token: null,
-//   user: null
-// };
-
 function initStore(preloadedState = {}){
   return createStore(
     createRootReducer(),
