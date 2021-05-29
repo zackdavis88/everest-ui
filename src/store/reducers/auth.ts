@@ -19,8 +19,10 @@ export default function authReducer(state=initialState, action) {
         isLoading: true
       };
     case TOKEN_SUCCESS:
-      if(typeof document === "object")
-        document.cookie = `token=${action.response.headers["x-everest-token"]}`
+      if(typeof document === "object"){
+        const expires = new Date(Date.now() + (1000 * 60 * 60 * 8)).toUTCString();
+        document.cookie = `token=${action.response.headers["x-everest-token"]}; expires=${expires}; path=/`
+      }
       return {
         isLoading: false,
         message: action.response.body.message,
@@ -29,7 +31,7 @@ export default function authReducer(state=initialState, action) {
       };
     case TOKEN_FAILURE:
       if(typeof document === "object")
-        document.cookie = `token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/`; // expire the cookie to delete.
+        document.cookie = `token=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/`; // expire the cookie to delete.
       return {
         ...initialState
       };
