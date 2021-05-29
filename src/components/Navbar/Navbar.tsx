@@ -14,10 +14,13 @@ import { RootState } from "../../store/store";
 import Link from "next/link";
 import Sidebar from "../Sidebar/Sidebar";
 import Menu from "../Menu/Menu";
+import { NavbarProps } from "./Navbar.props";
+import { logout } from "../../store/actions/auth";
 
-function Navbar(props) {
+function Navbar(props: NavbarProps) {
   const classes = useStyles();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const isAuthenticated = props.user || false;
 
   const toggleSidebar = (newOpenState) => (event) => {
     if(event.type === "keydown" && (event.key === "Tab" || event.key === "Shift")){
@@ -34,18 +37,18 @@ function Navbar(props) {
 
   const navigationItems = [{
     name: "Components",
-    url: "/"
+    url: "/components"
   }, {
     name: "Fragments",
-    url: "/page2"
+    url: "/fragments"
   }, {
     name: "Layouts",
-    url: "/page2"
+    url: "/layouts"
   }];
 
   const userMenuProps = {
     id: "navbar-user-menu",
-    menuName: props.user && props.user.displayName || "booya",
+    menuName: props.user && props.user.displayName || "My Account",
     menuItems: [{
       name: "Change Password",
       startIcon: <FontAwesomeIcon icon={faKey}/>,
@@ -55,7 +58,7 @@ function Navbar(props) {
     }, {
       name: "Sign Out",
       startIcon: <FontAwesomeIcon icon={faSignOutAlt}/>,
-      onClick: () => console.log("Logout")
+      onClick: () => props.logout()
     }],
     endIcon: <FontAwesomeIcon icon={faCaretDown} />
   };
@@ -105,17 +108,17 @@ function Navbar(props) {
   );
   
   return (
-    <AppBar position="static">
+    <AppBar position="static" color="primary">
       <Toolbar className={classes.toolbar} disableGutters>
         <Grid container alignItems="center" justify="center" className={classes.gridContainer}>
           <Grid item xs={2} sm={4} lg={4} className={classes.gridItem}>
-            {renderNavigation()}
+            {isAuthenticated && renderNavigation()}
           </Grid>
           <Grid item xs={8} sm={4} lg={4} className={classes.gridItem}>
             {renderBranding()}
           </Grid>
           <Grid item xs={2} sm={4} lg={4} className={classes.gridItem}>
-            {renderUserMenu()}
+            {isAuthenticated && renderUserMenu()}
           </Grid>
         </Grid>
       </Toolbar>
@@ -126,5 +129,5 @@ function Navbar(props) {
 export default connect((state: RootState) => ({
   user: state.auth.user
 }), {
-
+  logout
 })(Navbar);

@@ -4,7 +4,7 @@
   "description": "Web app for managing application content",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
+    "start": "NODE_TLS_REJECT_UNAUTHORIZED='0' node server.js",
     "build": "next build"
   },
   "repository": {
@@ -22,6 +22,7 @@
     "@fortawesome/free-solid-svg-icons": "^5.15.3",
     "@fortawesome/react-fontawesome": "^0.1.14",
     "@material-ui/core": "^4.11.4",
+    "cookie": "^0.4.1",
     "next": "^10.2.0",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",

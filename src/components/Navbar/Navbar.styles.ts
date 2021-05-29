@@ -2,7 +2,6 @@ import {makeStyles} from "@material-ui/core";
 
 export const useStyles = makeStyles((theme) => ({
   toolbar: {
-    backgroundColor: "#144E69",
     height: "64px",
     position: "relative"
   },

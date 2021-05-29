@@ -1,8 +1,7 @@
 import {
   TOKEN_REQUEST,
   TOKEN_SUCCESS,
-  TOKEN_FAILURE,
-  LOGOUT
+  TOKEN_FAILURE
 } from "../actions/auth";
 
 const initialState = {
@@ -20,7 +19,10 @@ export default function authReducer(state=initialState, action) {
         isLoading: true
       };
     case TOKEN_SUCCESS:
-      // localStorage.setItem("token", action.response.headers["x-everest-token"]);
+      if(typeof document === "object"){
+        const expires = new Date(Date.now() + (1000 * 60 * 60 * 8)).toUTCString();
+        document.cookie = `token=${action.response.headers["x-everest-token"]}; expires=${expires}; path=/`
+      }
       return {
         isLoading: false,
         message: action.response.body.message,
@@ -28,20 +30,10 @@ export default function authReducer(state=initialState, action) {
         token: action.response.headers["x-everest-token"]
       };
     case TOKEN_FAILURE:
+      if(typeof document === "object")
+        document.cookie = `token=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/`; // expire the cookie to delete.
       return {
-        ...state,
-        isLoading: false
-      };
-    case LOGOUT:
-      // localStorage.removeItem("token");
-      return {
-        ...initialState,
-        token: null
-      };
-    case "DEBUG":
-      return {
-        ...state,
-        message: "Serverside rendered"
+        ...initialState
       };
     default:
       return state;
