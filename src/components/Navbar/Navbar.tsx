@@ -37,13 +37,13 @@ function Navbar(props: NavbarProps) {
 
   const navigationItems = [{
     name: "Components",
-    url: "/"
+    url: "/components"
   }, {
     name: "Fragments",
-    url: "/page2"
+    url: "/fragments"
   }, {
     name: "Layouts",
-    url: "/page2"
+    url: "/layouts"
   }];
 
   const userMenuProps = {
