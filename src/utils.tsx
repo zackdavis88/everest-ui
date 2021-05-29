@@ -75,6 +75,9 @@ export const requireAuth = (ContainerComponent) => {
     text: {
       width: "100%",
       fontWeight: "bold"
+    },
+    marginTop: {
+      margin: "25px 0 0 0"
     }
   }));
 
@@ -98,7 +101,7 @@ export const requireAuth = (ContainerComponent) => {
                   Redirecting to Login Page...
                 </Typography>
               </Grid>
-              <Grid item xs={12} style={{margin: "25px 0 0 0"}}>
+              <Grid item xs={12} className={classes.marginTop}>
                 <CircularProgress />
               </Grid>
             </Grid>
