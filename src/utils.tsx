@@ -1,9 +1,16 @@
-import {useTheme, useMediaQuery} from "@material-ui/core";
-import {initializeStore} from "./store/store";
+import { initializeStore, RootState } from "./store/store";
 import cookie from "cookie";
 import apiConfig from "../config/api.json";
-import React from "react";
+import React, { useEffect } from "react";
 import { connect } from "react-redux";
+import { useRouter } from "next/router";
+import Backdrop from "@material-ui/core/Backdrop";
+import Typography from "@material-ui/core/Typography";
+import Grid from "@material-ui/core/Grid";
+import useTheme from "@material-ui/core/styles/useTheme";
+import useMediaQuery from "@material-ui/core/useMediaQuery";
+import makeStyles from "@material-ui/core/styles/makeStyles";
+import CircularProgress from "@material-ui/core/CircularProgress";
 
 // This is a hack to detect if we are calling getServerSideProps on the server.
 // For some reason getServerSideProps is called everytime a page loads even if its
@@ -53,15 +60,56 @@ export const getAuthToken = async context => {
   );
 };
 
-// TODO: This is where you left off. Build this HOC and make it connect to redux.
-// Have it monitor the auth token in state and if the token goes null then redirect to the login page.
 export const requireAuth = (ContainerComponent) => {
-  const AuthController = (props) => {
+  interface AuthControllerProps{
+    token?: string;
+  };
+
+  const useStyles = makeStyles((theme) => ({
+    backdrop: {
+      zIndex: theme.zIndex.drawer + 1,
+      padding: "25px",
+      color: theme.palette.common.black,
+      textAlign: "center"
+    },
+    text: {
+      width: "100%",
+      fontWeight: "bold"
+    }
+  }));
+
+  const AuthController = (props: AuthControllerProps) => {
+    const router = useRouter();
+    const classes = useStyles();
+    const token = props.token;
+    useEffect(() => {
+      // TODO: lets add a notification message here so the user knows why they were redirected.
+      // Also TODO: Build a notification system in redux from scratch.
+      if(!token)
+        router.push("/");
+    }, [token]);
     return (
       <>
-        <ContainerComponent/>
+        {!token ? (
+          <Backdrop className={classes.backdrop} open={true}>
+            <Grid container>
+              <Grid item xs={12}>
+                <Typography variant="body1" component="div" className={classes.text}>
+                  Redirecting to Login Page...
+                </Typography>
+              </Grid>
+              <Grid item xs={12} style={{margin: "25px 0 0 0"}}>
+                <CircularProgress />
+              </Grid>
+            </Grid>
+          </Backdrop>
+        ) : (
+          <ContainerComponent />
+        )}
       </>
     );
   };
-  return connect()(AuthController);
+  return connect((state: RootState) => ({
+    token: state.auth.token
+  }))(AuthController);
 };

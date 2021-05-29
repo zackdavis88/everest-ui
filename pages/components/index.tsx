@@ -11,7 +11,7 @@ import Collapse from "@material-ui/core/Collapse";
 import makeStyles from "@material-ui/core/styles/makeStyles";
 import { GetServerSideProps } from "next";
 import { connect } from "react-redux";
-import { getAuthToken } from "../../src/utils";
+import { getAuthToken, requireAuth } from "../../src/utils";
 import { RootState } from "../../src/store/store";
 import { faSignInAlt, faUserPlus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -35,4 +35,6 @@ function ComponentsIndex(props: ComponentsIndexProps) {
 
 export const getServerSideProps: GetServerSideProps = getAuthToken;
 
-export default connect()(ComponentsIndex);
+const ConnectedComponentsIndex = connect()(ComponentsIndex);
+
+export default requireAuth(ConnectedComponentsIndex);
