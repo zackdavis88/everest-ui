@@ -90,7 +90,7 @@ export const requireAuth = (PageComponent) => {
     const token = props.token;
     useEffect(() => {
       if(!token){
-        router.push(`/`).then(() => {
+        router.push(`/?redirectUrl=${router.pathname}`).then(() => {
           const message = "Please login below to use Everest."
           props.showNotification(message)
         });
