@@ -18,8 +18,8 @@ interface IndexProps {
 const useStyles = makeStyles(theme => ({
   container: {
     marginTop: "25px",
-    padding: "0",
-    borderRadius: "10px"
+    padding: "16px",
+    borderRadius: "5px"
   },
   box: {
     padding: "0 25px"
@@ -63,7 +63,7 @@ function Index(props: IndexProps) {
   return (
     <>
       <Head>
-        <title>Everest | Login Page</title>
+        <title>Everest | Login</title>
       </Head>
       <Container maxWidth="sm" className={classes.container}>
         {showLoginForm ? (
