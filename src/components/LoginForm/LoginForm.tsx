@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState } from "react";
 import Grid from "@material-ui/core/Grid";
 import Button from "@material-ui/core/Button";
 import Typography from "@material-ui/core/Typography";
@@ -18,51 +18,57 @@ import { LoginFormProps } from "./LoginForm.props";
 
 const LoginForm = (props: LoginFormProps) => {
   const classes = useStyles();
-  const usernameRef = useRef(null);
-  const passwordRef = useRef(null);
+  const [usernameInput, setUsernameInput] = useState("");
+  const [passwordInput, setPasswordInput] = useState("");
   const [formError, setFormError] = useState("");
   const router = useRouter();
+  const submitDisabled = () => !(usernameInput && passwordInput) || props.authInProgress;
   const usernameField = {
     id: "username-input",
+    required: true,
     type: "text",
     label: "Username",
     className: classes.usernameField,
     fullWidth: true,
-    inputRef: usernameRef,
-    onChange: () => {
+    value: usernameInput,
+    onChange: (event) => {
       if(formError)
-        return setFormError("");
+        setFormError("");
+      
+      setUsernameInput(event.target.value);
     }
   };
   const passwordField = {
     id: "password-input",
+    required: true,
     type: "password",
     label: "Password",
     className: classes.passwordField,
     fullWidth: true,
-    inputRef: passwordRef,
-    onChange: () => {
+    value: passwordInput,
+    onChange: (event) => {
       if(formError)
-        return setFormError("");
+        setFormError("");
+
+      setPasswordInput(event.target.value);
     }
   };
   const onSubmit = async(event) => {
     event.preventDefault();
     setFormError("");
-    const username = usernameRef.current.value || "";
-    const password = passwordRef.current.value || "";
+    const username = usernameInput || "";
+    const password = passwordInput || "";
     const response = await props.authenticate(username, password);
     if(response.error)
       return setFormError(response.error);
-    
-    usernameRef.current.value = "";
-    passwordRef.current.value = "";
+
+    setUsernameInput("");
+    setPasswordInput("");
 
     router.push(router.query.redirectUrl as UrlObject || "/home");
   };
   return (
-    <Box boxShadow={3} borderRadius="10px" className={classes.box} bgcolor="secondary.light" zIndex={"100"}>
-      
+    <Box boxShadow={3} borderRadius="10px" className={classes.box} bgcolor="secondary.light">
       {/* Form Heading */}
       <Typography variant="h4" component="h4" className={classes.heading}>
         Login Required
@@ -71,7 +77,7 @@ const LoginForm = (props: LoginFormProps) => {
 
       {/* Form Sub-Heading */}
       <Typography variant="body1" component="div" className={classes.subHeading}>
-        Authentication is required to use Everest. Please login or register below.
+        Authentication is required to use Everest. Please login or sign up below.
       </Typography>
       <Divider />
 
@@ -90,7 +96,7 @@ const LoginForm = (props: LoginFormProps) => {
         <TextField variant="filled" {...passwordField} />
         <Grid container spacing={2} justify="center">
           <Grid item xs={12} sm={6}>
-            <Button className={classes.button} variant="contained" size="large"  type="submit" fullWidth color="primary" startIcon={<FontAwesomeIcon icon={faSignInAlt} fixedWidth />}>
+            <Button className={classes.button} variant="contained" size="large"  type="submit" fullWidth color="primary" startIcon={<FontAwesomeIcon icon={faSignInAlt} fixedWidth />} disabled={submitDisabled()}>
               Login
             </Button>
           </Grid>
@@ -106,7 +112,7 @@ const LoginForm = (props: LoginFormProps) => {
 };
 
 export default connect((state: RootState) => ({
-
+  authInProgress: state.auth.isLoading
 }), {
   authenticate
 })(LoginForm);
