@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState } from "react";
 import Grid from "@material-ui/core/Grid";
 import Button from "@material-ui/core/Button";
 import Typography from "@material-ui/core/Typography";
@@ -8,70 +8,108 @@ import TextField from "@material-ui/core/TextField";
 import Collapse from "@material-ui/core/Collapse";
 import { connect } from "react-redux";
 import { RootState } from "../../store/store";
-import { faArrowCircleLeft, faUserPlus } from "@fortawesome/free-solid-svg-icons";
+import { faUserPlus, faArrowCircleLeft } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { authenticate } from "../../store/actions/auth";
-import { useRouter } from "next/router";
-import { UrlObject } from "url";
+import { createUser } from "../../store/actions/user";
+import { showNotification } from "../../store/actions/notification";
 import { useStyles } from "./SignUpForm.styles";
 import { SignUpFormProps } from "./SignUpForm.props";
 
 const SignUpForm = (props: SignUpFormProps) => {
   const classes = useStyles();
-  const usernameRef = useRef(null);
-  const passwordRef = useRef(null);
-  const confirmRef = useRef(null);
+  const [usernameInput, setUsernameInput] = useState({value: "", error: ""});
+  const [passwordInput, setPasswordInput] = useState({value: "", error: ""});
+  const [confirmInput, setConfirmInput] = useState({value: "", error: ""});
+  const [requestInProgress, setRequestInProgress] = useState(false);
   const [formError, setFormError] = useState("");
-  const router = useRouter();
+  const submitDisabled = () => !!(
+    !(usernameInput.value && passwordInput.value && confirmInput.value) ||
+    (usernameInput.error || passwordInput.error || confirmInput.error) ||
+    requestInProgress
+  );
   const usernameField = {
     id: "username-input",
+    required: true,
     type: "text",
     label: "Username",
     className: classes.usernameField,
     fullWidth: true,
-    inputRef: usernameRef,
-    onChange: () => {
+    value: usernameInput.value,
+    error: !!usernameInput.error,
+    helperText: usernameInput.error,
+    onChange: (event) => {
       if(formError)
-        return setFormError("");
+        setFormError("");
+      
+      setUsernameInput({value: event.target.value, error: ""});
     }
   };
   const passwordField = {
     id: "password-input",
+    required: true,
     type: "password",
     label: "Password",
     className: classes.passwordField,
     fullWidth: true,
-    inputRef: passwordRef,
-    onChange: () => {
+    value: passwordInput.value,
+    error: !!passwordInput.error,
+    helperText: passwordInput.error,
+    onChange: (event) => {
       if(formError)
-        return setFormError("");
+        setFormError("");
+
+      setPasswordInput({value: event.target.value, error: ""});
     }
   };
   const confirmField = {
     id: "confirm-input",
+    required: true,
     type: "password",
     label: "Confirm Password",
     className: classes.confirmField,
     fullWidth: true,
-    inputRef: confirmRef,
-    onChange: () => {
+    value: confirmInput.value,
+    error: !!confirmInput.error,
+    helperText: confirmInput.error,
+    onChange: (event) => {
       if(formError)
-        return setFormError("");
+        setFormError("");
+      
+      setConfirmInput({value: event.target.value, error: ""});
     }
   };
   const onSubmit = async(event) => {
     event.preventDefault();
-    // setFormError("");
-    // const username = usernameRef.current.value || "";
-    // const password = passwordRef.current.value || "";
-    // const response = await props.authenticate(username, password);
-    // if(response.error)
-    //   return setFormError(response.error);
-    
-    // usernameRef.current.value = "";
-    // passwordRef.current.value = "";
+    setRequestInProgress(true);
+    setFormError("");
+    const username = usernameInput.value;
+    const password = passwordInput.value;
+    const confirm = confirmInput.value;
 
-    // router.push(router.query.redirectUrl as UrlObject || "/home");
+    if(password !== confirm){
+      const message = "password inputs must be matching";
+      setConfirmInput({...confirmInput, error: message});
+      return setRequestInProgress(false);
+    }
+
+    const response = await props.createUser(username, password);
+    const error: string = response.error;
+    if(error && error.startsWith("username")){
+      setUsernameInput({...usernameInput, error: error});
+      return setRequestInProgress(false);
+    }
+    else if(error && error.startsWith("password")){
+      setPasswordInput({...passwordInput, error: error});
+      return setRequestInProgress(false);
+    }
+    else if(error){
+      setFormError(error);
+      return setRequestInProgress(false);
+    }
+
+    setRequestInProgress(false);
+    props.setShowLoginForm(true);
+    props.showNotification("User has been successfully created, login below.", "success")
   };
   return (
     <Box boxShadow={3} borderRadius="10px" className={classes.box} bgcolor="secondary.light" zIndex={"100"}>
@@ -104,7 +142,7 @@ const SignUpForm = (props: SignUpFormProps) => {
         <TextField variant="filled" {...confirmField} />
         <Grid container spacing={2} justify="center">
           <Grid item xs={12} sm={6}>
-            <Button className={classes.button} variant="contained" size="large"  type="submit" fullWidth color="primary" startIcon={<FontAwesomeIcon icon={faUserPlus} fixedWidth />}>
+            <Button className={classes.button} variant="contained" size="large"  type="submit" fullWidth color="primary" startIcon={<FontAwesomeIcon icon={faUserPlus} fixedWidth />} disabled={submitDisabled()}>
               Sign Up
             </Button>
           </Grid>
@@ -122,5 +160,6 @@ const SignUpForm = (props: SignUpFormProps) => {
 export default connect((state: RootState) => ({
 
 }), {
-  authenticate
+  createUser,
+  showNotification
 })(SignUpForm);

@@ -1,4 +1,5 @@
 export interface SignUpFormProps{
-  authenticate: (username: string, password: string) => any;
+  createUser: (username: string, password: string) => any;
+  showNotification: (message: string, type?: string, autoClose?: boolean) => void;
   setShowLoginForm: (boolean) => void;
 };
