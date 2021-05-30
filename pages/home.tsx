@@ -11,7 +11,7 @@ import { getAuthToken, requireAuth } from "../src/utils";
 import { RootState } from "../src/store/store";
 import { faCubes, faCode, faTh, faLaptopCode } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useRouter } from "next/router";
+import Link from "next/link";
 
 interface HomeProps {
   initialReduxState?: RootState;
@@ -55,7 +55,7 @@ const useStyles = makeStyles(theme => ({
   },
   cardInnerContainer: {
     padding: "25px",
-    height: "285px"
+    minHeight: "285px"
   },
   title: {
     fontWeight: "bold"
@@ -68,7 +68,6 @@ const useStyles = makeStyles(theme => ({
 
 function Home(props: HomeProps) {
   const classes = useStyles();
-  const router = useRouter();
   const appItems = [{
     icon: faCubes,
     title: "Blueprints",
@@ -90,23 +89,22 @@ function Home(props: HomeProps) {
     subtitle: "Create a JSON blob that can be fetched by your application.",
     url: "/fragments"
   }];
-  const handleClick = (url) => (event) => {
-    router.push(url);
-  };
   const renderCard = (item) => (
     <Card elevation={3} className={classes.card}>
-      <CardActionArea onClick={handleClick(item.url)}>
-        <div className={classes.cardInnerContainer}>
-          <FontAwesomeIcon icon={item.icon} size="7x" fixedWidth/>
-          <Typography variant="h6" component="div" className={classes.title}>
-            {item.title}
-          </Typography>
-          <Divider />
-          <Typography variant="subtitle1" component="div" className={classes.subtitle}>
-            {item.subtitle}
-          </Typography>
-        </div>
-      </CardActionArea>
+      <Link href={item.url}>
+        <CardActionArea component="a">
+          <div className={classes.cardInnerContainer}>
+            <FontAwesomeIcon icon={item.icon} size="7x" fixedWidth/>
+            <Typography variant="h6" component="div" className={classes.title}>
+              {item.title}
+            </Typography>
+            <Divider />
+            <Typography variant="subtitle1" component="div" className={classes.subtitle}>
+              {item.subtitle}
+            </Typography>
+          </div>
+        </CardActionArea>
+      </Link>
     </Card>
   );
   return (
