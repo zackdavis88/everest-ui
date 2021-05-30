@@ -37,7 +37,7 @@ export default function Custom404() {
       <Typography variant="h5" component="div" className={classes.subtitle}>
         Oh no! It looks like the requested page does not exist, use your browser or the button below to get back to Everest.
       </Typography>
-      <Button component="a" href="/" variant="contained" color="primary" className={classes.button} size="large" startIcon={<FontAwesomeIcon icon={faHandPointLeft} fixedWidth/>}>
+      <Button component="a" href="/home" variant="contained" color="primary" className={classes.button} size="large" startIcon={<FontAwesomeIcon icon={faHandPointLeft} fixedWidth/>}>
         Back to Everest
       </Button>
     </Container>
