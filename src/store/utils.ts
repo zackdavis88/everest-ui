@@ -20,7 +20,11 @@ export const apiMiddleware = store => next => action => {
   if(payload){
     options = {
       ...options,
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
+      headers: {
+        ...options.headers,
+        "Content-Type": "application/json"
+      }
     }
   }
   
