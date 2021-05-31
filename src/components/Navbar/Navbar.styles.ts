@@ -14,12 +14,8 @@ export const useStyles = makeStyles((theme) => ({
   gridItem: {
     "& #navbar-user-menu": {
       textAlign: "right",
-      margin: "0 13px",
-      "& .MuiButton-root": {
-        [theme.breakpoints.up(theme.breakpoints.values.lg)]: {
-          fontSize: "14px"
-        },
-        [theme.breakpoints.down(theme.breakpoints.values.lg)]: {
+      [theme.breakpoints.down(theme.breakpoints.values.lg)]:{
+        "& .MuiButton-label": {
           fontSize: "12px"
         }
       }
@@ -54,13 +50,6 @@ export const useStyles = makeStyles((theme) => ({
   navItem: {
     fontWeight: "bold",
     height: "64px",
-    borderRadius: "0",
-    margin: "0 5px",
-    [theme.breakpoints.up(theme.breakpoints.values.lg)]: {
-      fontSize: "14px"
-    },
-    [theme.breakpoints.down(theme.breakpoints.values.lg)]: {
-      fontSize: "12px"
-    }
+    borderRadius: "0"
   }
 }));

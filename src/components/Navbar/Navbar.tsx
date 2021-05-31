@@ -1,12 +1,23 @@
-import {useState, useEffect} from "react";
+import {useState, useEffect, ReactElement} from "react";
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
 import Grid from "@material-ui/core/Grid";
 import Typography from "@material-ui/core/Typography";
-import Button from "@material-ui/core/Button";
 import IconButton from "@material-ui/core/IconButton";
+import Button from "@material-ui/core/Button";
 import Hidden from "@material-ui/core/Hidden";
-import { faMountain, faBars, faKey, faSignOutAlt, faCaretDown } from "@fortawesome/free-solid-svg-icons";
+import { 
+  faMountain, 
+  faBars, 
+  faKey, 
+  faSignOutAlt, 
+  faCaretDown, 
+  faCubes, 
+  faCode, 
+  faTh, 
+  faLaptopCode,
+  faSitemap
+} from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { connect } from "react-redux";
 import { useStyles } from "./Navbar.styles";
@@ -16,9 +27,11 @@ import Sidebar from "../Sidebar/Sidebar";
 import Menu from "../Menu/Menu";
 import { NavbarProps } from "./Navbar.props";
 import { logout } from "../../store/actions/auth";
+import { useWidth } from "../../utils";
 
 function Navbar(props: NavbarProps) {
   const classes = useStyles();
+  const breakpoint = useWidth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const isAuthenticated = props.user || false;
 
@@ -35,46 +48,73 @@ function Navbar(props: NavbarProps) {
     return () => window.removeEventListener("resize", resizeCallback);
   }, []);
 
-  const navigationItems = [{
-    name: "Components",
-    url: "/components"
-  }, {
-    name: "Fragments",
-    url: "/fragments"
-  }, {
-    name: "Layouts",
-    url: "/layouts"
-  }];
-
   const userMenuProps = {
     id: "navbar-user-menu",
     menuName: props.user && props.user.displayName || "My Account",
     menuItems: [{
       name: "Change Password",
-      startIcon: <FontAwesomeIcon icon={faKey}/>,
+      startIcon: <FontAwesomeIcon icon={faKey} fixedWidth/>,
       onClick: () => {
         console.log("Change Password");
       }
     }, {
       name: "Sign Out",
-      startIcon: <FontAwesomeIcon icon={faSignOutAlt}/>,
+      startIcon: <FontAwesomeIcon icon={faSignOutAlt} fixedWidth/>,
       onClick: () => props.logout()
     }],
-    endIcon: <FontAwesomeIcon icon={faCaretDown} />
+    endIcon: <FontAwesomeIcon icon={faCaretDown} fixedWidth/>
   };
 
-  const sidebarProps = {
+  const navItems = [{
+      name: "Blueprints",
+      startIcon: <FontAwesomeIcon icon={faCubes} fixedWidth size="lg" />,
+      url: "/blueprints"
+    }, {
+      name: "Components",
+      startIcon: <FontAwesomeIcon icon={faCode} fixedWidth size="lg"/>,
+      url: "/components"
+    }, {
+      name: "Layouts",
+      startIcon: <FontAwesomeIcon icon={faTh} fixedWidth size="lg"/>,
+      url: "/layouts"
+    }, {
+      name: "Fragments",
+      startIcon: <FontAwesomeIcon icon={faLaptopCode} fixedWidth size="lg"/>,
+      url: "/fragments"
+    }];
+
+  const sidebarProps: {
+    isOpen: boolean;
+    onClose: (event: any) => void;
+    navigationItems: {
+      name: string;
+      startIcon?: ReactElement;
+      url?: string;
+      onClick?: () => void;
+      navigationItems?: {
+        name: string;
+        startIcon?: ReactElement;
+        url?: string;
+        onClick?: () => void;
+      }[]
+    }[];
+    closeSidebar: () => void;
+  } = {
     isOpen: sidebarOpen,
     onClose: toggleSidebar(false),
-    navigationItems: [
-      ...navigationItems,
+    navigationItems: [...navItems],
+    closeSidebar: () => setSidebarOpen(false)
+  };
+  
+  if(breakpoint === "sm" || breakpoint === "xs"){
+    sidebarProps.navigationItems = [
+      ...sidebarProps.navigationItems,
       {
         name: "My Account",
         navigationItems: [...userMenuProps.menuItems]
       }
-    ],
-    closeSidebar: () => setSidebarOpen(false)
-  };
+    ];
+  }
 
   const renderBranding = () => (
     <Link href={isAuthenticated ? "/home" : "/"}>
@@ -91,15 +131,13 @@ function Navbar(props: NavbarProps) {
         <IconButton color="inherit" onClick={toggleSidebar(!sidebarOpen)}>
           <FontAwesomeIcon icon={faBars}/>
         </IconButton>
-        <Sidebar {...sidebarProps}/>
       </Hidden>
       <Hidden implementation="css" smDown>
-        {navigationItems.map((item, index) => (
-          <Link key={index} href={item.url}>
-            <Button component="a" color="inherit" className={classes.navItem}>{item.name}</Button>
-          </Link>
-        ))}
+        <Button variant="text" color="inherit" className={classes.navItem} startIcon={<FontAwesomeIcon icon={faSitemap} fixedWidth/>} onClick={toggleSidebar(!sidebarOpen)}>
+          Navigation Menu
+        </Button>
       </Hidden>
+      <Sidebar {...sidebarProps}/>
     </>
   );
   
@@ -111,7 +149,7 @@ function Navbar(props: NavbarProps) {
   
   return (
     <AppBar position="static" color="primary">
-      <Toolbar className={classes.toolbar} disableGutters>
+      <Toolbar className={classes.toolbar}>
         <Grid container alignItems="center" justify="center" className={classes.gridContainer}>
           <Grid item xs={2} sm={4} lg={4} className={classes.gridItem}>
             {isAuthenticated && renderNavigation()}
