@@ -11,11 +11,12 @@ import { useStyles } from "./Notification.styles";
 import { faTimes } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useRouter } from "next/router";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 const Notification = (props: NotificationProps) => {
   const classes = useStyles(props);
   const router = useRouter();
+  const closeButtonRef = useRef();
   const getStylesForType = (type: string) => {
     switch(type.toLowerCase()){
       case "info":
@@ -40,6 +41,12 @@ const Notification = (props: NotificationProps) => {
       router.events.off("routeChangeStart", handleRouteChange);
     };
   }, []);
+
+  useEffect(() => {
+    const closeButton: {focus?: any} = closeButtonRef.current || {};
+    if(!!props.message && closeButton.focus)
+      closeButton.focus();
+  }, [props.message])
   return (
     <Collapse in={!!props.message}>
       <Container maxWidth="md" className={classes.container}>
@@ -47,7 +54,7 @@ const Notification = (props: NotificationProps) => {
           <Typography variant="subtitle1" component="span">
             {props.message}
           </Typography>
-          <IconButton className={classes.close} onClick={() => props.hideNotification()}>
+          <IconButton ref={closeButtonRef} className={classes.close} onClick={() => props.hideNotification()}>
             <FontAwesomeIcon icon={faTimes} fixedWidth/>
           </IconButton>
         </Box>
