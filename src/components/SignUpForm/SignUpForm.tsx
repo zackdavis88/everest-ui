@@ -14,6 +14,8 @@ import { createUser } from "../../store/actions/user";
 import { showNotification } from "../../store/actions/notification";
 import { useStyles } from "./SignUpForm.styles";
 import { SignUpFormProps } from "./SignUpForm.props";
+import Slide from "@material-ui/core/Slide";
+import Container from "@material-ui/core/Container";
 
 const SignUpForm = (props: SignUpFormProps) => {
   const classes = useStyles();
@@ -112,48 +114,52 @@ const SignUpForm = (props: SignUpFormProps) => {
     props.showNotification("User has been successfully created, login below.", "success")
   };
   return (
-    <Box boxShadow={3} borderRadius="10px" className={classes.box} bgcolor="secondary.light" zIndex={"100"}>
-      
-      {/* Form Heading */}
-      <Typography variant="h4" component="h4" className={classes.heading}>
-        User Sign Up
-      </Typography>
-      <Divider />
-
-      {/* Form Sub-Heading */}
-      <Typography variant="body1" component="div" className={classes.subHeading}>
-        Fill out the form below with your details to create an Everest account.
-      </Typography>
-      <Divider />
-
-      {/* Form Error Message */}
-      <Collapse in={!!formError}>
-        <Box boxShadow={1} borderRadius="10px" className={`${classes.box} ${classes.formError}`} bgcolor="error.main">
-          <Typography variant="subtitle1" component="div">
-            {formError}
+    <Slide direction="right" in={props.in}>
+      <Container maxWidth="sm" className={classes.container}>
+        <Box boxShadow={3} borderRadius="10px" className={classes.box} bgcolor="secondary.light" zIndex={"100"}>
+          
+          {/* Form Heading */}
+          <Typography variant="h4" component="h4" className={classes.heading}>
+            User Sign Up
           </Typography>
-        </Box>
-      </Collapse>
+          <Divider />
 
-      {/* Form Inputs and Controls */}
-      <form noValidate autoComplete="off" className={classes.form} onSubmit={onSubmit}>
-        <TextField variant="filled" {...usernameField} />
-        <TextField variant="filled" {...passwordField} />
-        <TextField variant="filled" {...confirmField} />
-        <Grid container spacing={2} justify="center">
-          <Grid item xs={12} sm={6}>
-            <Button className={classes.button} variant="contained" size="large"  type="submit" fullWidth color="primary" startIcon={<FontAwesomeIcon icon={faUserPlus} fixedWidth />} disabled={submitDisabled()}>
-              Sign Up
-            </Button>
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <Button onClick={() => props.setShowLoginForm(true)} className={classes.button} variant="outlined" size="large" fullWidth color="primary" startIcon={<FontAwesomeIcon icon={faArrowCircleLeft} fixedWidth />}>
-              Back
-            </Button>
-          </Grid>
-        </Grid>
-      </form>
-    </Box>
+          {/* Form Sub-Heading */}
+          <Typography variant="body1" component="div" className={classes.subHeading}>
+            Fill out the form below with your details to create an Everest account.
+          </Typography>
+          <Divider />
+
+          {/* Form Error Message */}
+          <Collapse in={!!formError}>
+            <Box boxShadow={1} borderRadius="10px" className={`${classes.box} ${classes.formError}`} bgcolor="error.main">
+              <Typography variant="subtitle1" component="div">
+                {formError}
+              </Typography>
+            </Box>
+          </Collapse>
+
+          {/* Form Inputs and Controls */}
+          <form noValidate autoComplete="off" className={classes.form} onSubmit={onSubmit}>
+            <TextField variant="filled" {...usernameField} />
+            <TextField variant="filled" {...passwordField} />
+            <TextField variant="filled" {...confirmField} />
+            <Grid container spacing={2} justify="center">
+              <Grid item xs={12} sm={6}>
+                <Button className={classes.button} variant="contained" size="large"  type="submit" fullWidth color="primary" startIcon={<FontAwesomeIcon icon={faUserPlus} fixedWidth />} disabled={submitDisabled()}>
+                  Sign Up
+                </Button>
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <Button onClick={() => props.setShowLoginForm(true)} className={classes.button} variant="outlined" size="large" fullWidth color="primary" startIcon={<FontAwesomeIcon icon={faArrowCircleLeft} fixedWidth />}>
+                  Back
+                </Button>
+              </Grid>
+            </Grid>
+          </form>
+        </Box>
+      </Container>
+    </Slide>
   );
 };
 

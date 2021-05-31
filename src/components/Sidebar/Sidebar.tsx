@@ -1,4 +1,4 @@
-import { useState, Fragment } from "react";
+import React, { useState, Fragment } from "react";
 import Drawer from "@material-ui/core/Drawer";
 import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
@@ -8,13 +8,12 @@ import Divider from "@material-ui/core/Divider";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCaretDown, faCaretUp } from "@fortawesome/free-solid-svg-icons";
 import { useStyles } from "./Sidebar.styles";
-import { useRouter } from "next/router";
 import { SidebarProps } from "./Sidebar.props";
+import Link from "next/link";
 
 const Sidebar = (props: SidebarProps) => {
   const classes = useStyles(props);
   const [openSubMenu, setOpenSubMenu] = useState(null);
-  const router = useRouter();
   const handleSubMenuClick = (index) => {
     if(index === openSubMenu)
       return setOpenSubMenu(null);
@@ -23,16 +22,15 @@ const Sidebar = (props: SidebarProps) => {
   };
 
   const renderMenuItem = (navItem, inset=false) => {
-    const onClick = navItem.onClick ? () => {
-      navItem.onClick();
-      props.closeSidebar();
-    } : () => {
-      if(navItem.url)
-        router.push(navItem.url);
-      props.closeSidebar();
-    };
-    return (
-      <ListItem button className={classes.menuItem} onClick={onClick}>
+    return navItem.url ? (
+      <Link href={navItem.url}>
+        <ListItem button className={classes.menuItem} onClick={() => props.closeSidebar()} component="a">
+          {navItem.startIcon ? navItem.startIcon : null}
+          <ListItemText primary={navItem.name.toUpperCase()} inset={inset || !!navItem.startIcon} />
+        </ListItem>
+      </Link>
+    ) : (
+      <ListItem button className={classes.menuItem} onClick={() => {props.closeSidebar(); navItem.onClick()}}>
         {navItem.startIcon ? navItem.startIcon : null}
         <ListItemText primary={navItem.name.toUpperCase()} inset={inset || !!navItem.startIcon} />
       </ListItem>

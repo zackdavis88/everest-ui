@@ -2,12 +2,16 @@ import makeStyles from "@material-ui/core/styles/makeStyles";
 
 export const useStyles = makeStyles(theme => ({
   container: {
-    marginTop: "25px",
-    padding: "0",
-    borderRadius: "10px"
+    padding: "0 16px",
+    borderRadius: "5px",
+    position: "absolute",
+    top: 0,
+    left: 0,
+    zIndex: 10
   },
   box: {
-    padding: "0 25px"
+    padding: "0 25px",
+    position: "relative"
   },
   heading: {
     color: theme.palette.text.primary,
