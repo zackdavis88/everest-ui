@@ -84,7 +84,7 @@ const Menu = (props: MenuProps) => {
       >
         {props.menuName}
       </Button>
-      <Popper open={open} anchorEl={anchorRef.current} role={undefined} transition placement="bottom-end" className={classes.popper}>
+      <Popper open={open} anchorEl={anchorRef.current} role={undefined} disablePortal transition placement="bottom-end" className={classes.popper}>
         {({ TransitionProps, placement }) => (
           <Grow
             {...TransitionProps}
