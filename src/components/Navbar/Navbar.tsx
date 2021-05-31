@@ -28,11 +28,13 @@ import Menu from "../Menu/Menu";
 import { NavbarProps } from "./Navbar.props";
 import { logout } from "../../store/actions/auth";
 import { useWidth } from "../../utils";
+import ChangePasswordModal from "../ChangePasswordModal/ChangePasswordModal";
 
 function Navbar(props: NavbarProps) {
   const classes = useStyles();
   const breakpoint = useWidth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
   const isAuthenticated = props.user || false;
 
   const toggleSidebar = (newOpenState) => (event) => {
@@ -41,6 +43,9 @@ function Navbar(props: NavbarProps) {
     }
     return setSidebarOpen(newOpenState);
   };
+
+  const handleModalOpen = () => setModalOpen(true);
+  const handleModalClose = () => setModalOpen(false);
 
   useEffect(() => {
     const resizeCallback = () => setSidebarOpen(false);
@@ -54,9 +59,7 @@ function Navbar(props: NavbarProps) {
     menuItems: [{
       name: "Change Password",
       startIcon: <FontAwesomeIcon icon={faKey} fixedWidth/>,
-      onClick: () => {
-        console.log("Change Password");
-      }
+      onClick: handleModalOpen
     }, {
       name: "Sign Out",
       startIcon: <FontAwesomeIcon icon={faSignOutAlt} fixedWidth/>,
@@ -90,12 +93,12 @@ function Navbar(props: NavbarProps) {
       name: string;
       startIcon?: ReactElement;
       url?: string;
-      onClick?: () => void;
+      onClick?: any;
       navigationItems?: {
         name: string;
         startIcon?: ReactElement;
         url?: string;
-        onClick?: () => void;
+        onClick?: any;
       }[]
     }[];
     closeSidebar: () => void;
@@ -146,23 +149,25 @@ function Navbar(props: NavbarProps) {
       <Menu {...userMenuProps} />
     </Hidden>
   );
-  
   return (
-    <AppBar position="static" color="primary">
-      <Toolbar className={classes.toolbar}>
-        <Grid container alignItems="center" justify="center" className={classes.gridContainer}>
-          <Grid item xs={2} sm={4} lg={4} className={classes.gridItem}>
-            {isAuthenticated && renderNavigation()}
+    <>
+      <AppBar position="static" color="primary">
+        <Toolbar className={classes.toolbar}>
+          <Grid container alignItems="center" justify="center" className={classes.gridContainer}>
+            <Grid item xs={2} sm={4} lg={4} className={classes.gridItem}>
+              {isAuthenticated && renderNavigation()}
+            </Grid>
+            <Grid id="navbar-brand" item xs={8} sm={4} lg={4} className={classes.gridItem}>
+              {renderBranding()}
+            </Grid>
+            <Grid item xs={2} sm={4} lg={4} className={classes.gridItem}>
+              {isAuthenticated && renderUserMenu()}
+            </Grid>
           </Grid>
-          <Grid id="navbar-brand" item xs={8} sm={4} lg={4} className={classes.gridItem}>
-            {renderBranding()}
-          </Grid>
-          <Grid item xs={2} sm={4} lg={4} className={classes.gridItem}>
-            {isAuthenticated && renderUserMenu()}
-          </Grid>
-        </Grid>
-      </Toolbar>
-    </AppBar>
+        </Toolbar>
+      </AppBar>
+      <ChangePasswordModal isOpen={modalOpen} handleClose={handleModalClose} />
+    </>
   );
 }
 

@@ -8,7 +8,7 @@ export interface MenuProps {
   disableRipple?: boolean;
   menuItems: {
     name: string;
-    onClick?: () => void;
+    onClick?: any;
     startIcon?: ReactElement;
     endIcon?: ReactElement;
     url?: string;
