@@ -21,10 +21,10 @@ export const useStyles = makeStyles((theme) => ({
       top: `64px !important`,
       height: `calc(100% - 64px)`,
     },
-    "& .MuiBackdrop-root": {
-      top: `64px`,
-      height: `calc(100% - 64px)`,
-    },
+    // "& .MuiBackdrop-root": {
+    //   top: `64px`,
+    //   height: `calc(100% - 64px)`,
+    // },
     "& .MuiListItemText-primary": {
       fontSize: "0.875rem",
       fontWeight: "bold"
