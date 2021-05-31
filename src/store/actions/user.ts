@@ -12,3 +12,14 @@ export const createUser = (username: string, password: string) => dispatch => {
     payload: {username, password}
   });
 };
+
+export const updatePassword = (username: string, currentPassword: string, newPassword: string) => dispatch => {
+  return dispatch({
+    types: [USER_REQUEST, USER_SUCCESS, USER_FAILURE],
+    reqUrl: `/api/users/${username}`,
+    reqOptions: {
+      method: "POST"
+    },
+    payload: {currentPassword, password: newPassword}
+  });
+};
