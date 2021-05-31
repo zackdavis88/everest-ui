@@ -44,6 +44,14 @@ const Menu = (props: MenuProps) => {
     prevOpen.current = open;
   }, [open]);
   
+  useEffect(() => {
+    const handleResize = () => {
+      setOpen(false);
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   const renderMenuItem = (menuItem, index) => {
     return menuItem.url ? (
       <Link href={menuItem.url} key={index}>
@@ -76,7 +84,7 @@ const Menu = (props: MenuProps) => {
       >
         {props.menuName}
       </Button>
-      <Popper open={open} anchorEl={anchorRef.current} role={undefined} transition disablePortal placement="bottom-end" className={classes.popper}>
+      <Popper open={open} anchorEl={anchorRef.current} role={undefined} transition placement="bottom-end" className={classes.popper}>
         {({ TransitionProps, placement }) => (
           <Grow
             {...TransitionProps}
