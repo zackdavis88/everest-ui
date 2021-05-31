@@ -5,10 +5,11 @@ export interface SidebarProps {
   navigationItems: {
     name: string;
     url?: string;
+    onClick?: any;
     navigationItems?: {
       name: string;
       url?: string;
-      onClick?: () => void
+      onClick?: any;
     }[];
   }[];
 };
