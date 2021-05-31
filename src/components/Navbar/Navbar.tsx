@@ -77,10 +77,12 @@ function Navbar(props: NavbarProps) {
   };
 
   const renderBranding = () => (
-    <Typography component="h4" variant="h4" className={classes.brandText}>
-      <FontAwesomeIcon icon={faMountain} className={classes.brandIcon} />
-      EVEREST
-    </Typography>
+    <Link href={isAuthenticated ? "/home" : "/"}>
+      <Typography component="a" variant="h4" className={classes.brandText}>
+        <FontAwesomeIcon icon={faMountain} className={classes.brandIcon} />
+        EVEREST
+      </Typography>
+    </Link>
   );
 
   const renderNavigation = () => (
@@ -114,7 +116,7 @@ function Navbar(props: NavbarProps) {
           <Grid item xs={2} sm={4} lg={4} className={classes.gridItem}>
             {isAuthenticated && renderNavigation()}
           </Grid>
-          <Grid item xs={8} sm={4} lg={4} className={classes.gridItem}>
+          <Grid id="navbar-brand" item xs={8} sm={4} lg={4} className={classes.gridItem}>
             {renderBranding()}
           </Grid>
           <Grid item xs={2} sm={4} lg={4} className={classes.gridItem}>

@@ -6,7 +6,10 @@ export const useStyles = makeStyles((theme) => ({
     position: "relative"
   },
   gridContainer: {
-    height: "100%"
+    height: "100%",
+    "& #navbar-brand": {
+      textAlign: "center",
+    }
   },
   gridItem: {
     "& #navbar-user-menu": {
@@ -37,10 +40,10 @@ export const useStyles = makeStyles((theme) => ({
   },
   brandText: {
     width: "100%",
-    display: "block",
+    display: "inline",
     fontWeight: "bold",
     lineHeight: "64px",
-    textAlign: "center",
+    cursor: "pointer",
     [theme.breakpoints.up(theme.breakpoints.values.lg)]: {
       fontSize: "35px"
     },
