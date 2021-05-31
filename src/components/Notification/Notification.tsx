@@ -54,7 +54,7 @@ const Notification = (props: NotificationProps) => {
           <Typography variant="subtitle1" component="span">
             {props.message}
           </Typography>
-          <IconButton ref={closeButtonRef} className={classes.close} onClick={() => props.hideNotification()}>
+          <IconButton disableFocusRipple ref={closeButtonRef} className={classes.close} onClick={() => props.hideNotification()}>
             <FontAwesomeIcon icon={faTimes} fixedWidth/>
           </IconButton>
         </Box>

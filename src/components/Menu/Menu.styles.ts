@@ -1,11 +1,15 @@
 import {makeStyles} from "@material-ui/core";
+import { fade } from '@material-ui/core/styles/colorManipulator';
 
 export const useStyles = makeStyles((theme) => ({
   root: {
     "& .MuiButton-root": {
       textTransform: "none",
       fontWeight: "bold",
-      fontSize: "14px"
+      fontSize: "14px",
+      "&:focus": {
+        backgroundColor: fade(theme.palette.common.white, 0.1)
+      }
     }
   },
   itemStartIcon: {
