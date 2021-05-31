@@ -33,7 +33,8 @@ const Sidebar = (props: SidebarProps) => {
     };
     return (
       <ListItem button className={classes.menuItem} onClick={onClick}>
-        <ListItemText primary={navItem.name.toUpperCase()} inset={inset} />
+        {navItem.startIcon ? navItem.startIcon : null}
+        <ListItemText primary={navItem.name.toUpperCase()} inset={inset || !!navItem.startIcon} />
       </ListItem>
     );
   };
