@@ -2,7 +2,7 @@ import makeStyles from "@material-ui/core/styles/makeStyles";
 
 export const useStyles = makeStyles((theme) => ({
   container: {
-    padding: "25px 0 0 0"
+    padding: "25px 16px 0 16px"
   },
   box: {
     position: "relative",
