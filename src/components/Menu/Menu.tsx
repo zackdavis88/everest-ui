@@ -8,6 +8,7 @@ import MenuItem from "@material-ui/core/MenuItem";
 import MenuList from "@material-ui/core/MenuList";
 import { useStyles } from "./Menu.styles";
 import { MenuProps } from "./Menu.props";
+import Link from "next/link";
 
 const Menu = (props: MenuProps) => {
   const classes = useStyles(props);
@@ -43,6 +44,24 @@ const Menu = (props: MenuProps) => {
     prevOpen.current = open;
   }, [open]);
   
+  const renderMenuItem = (menuItem, index) => {
+    return menuItem.url ? (
+      <Link href={menuItem.url} key={index}>
+        <MenuItem component="a" onClick={handleClose}>
+          {menuItem.startIcon ? (<span className={classes.itemStartIcon}>{menuItem.startIcon}</span>) : null}
+          {menuItem.name}
+          {menuItem.endIcon ? (<span className={classes.itemEndIcon}>{menuItem.endIcon}</span>) : null}
+        </MenuItem>
+      </Link>
+    ) : (
+      <MenuItem key={index} onClick={(e) => {handleClose(e); menuItem.onClick();}}>
+        {menuItem.startIcon ? (<span className={classes.itemStartIcon}>{menuItem.startIcon}</span>) : null}
+        {menuItem.name}
+        {menuItem.endIcon ? (<span className={classes.itemEndIcon}>{menuItem.endIcon}</span>) : null}
+      </MenuItem>
+    );
+  };
+
   return (
     <div className={classes.root} id={props.id}>
       <Button
@@ -66,13 +85,7 @@ const Menu = (props: MenuProps) => {
             <Paper>
               <ClickAwayListener onClickAway={handleClose}>
                 <MenuList autoFocusItem={open} id={props.id} onKeyDown={handleListKeyDown}>
-                  {props.menuItems.map((menuItem, index) => (
-                    <MenuItem key={index} onClick={(e) => {handleClose(e); menuItem.onClick()}}>
-                      {menuItem.startIcon ? (<span className={classes.itemStartIcon}>{menuItem.startIcon}</span>) : null}
-                      {menuItem.name}
-                      {menuItem.endIcon ? (<span className={classes.itemEndIcon}>{menuItem.endIcon}</span>) : null}
-                    </MenuItem>
-                  ))}
+                  {props.menuItems.map(renderMenuItem)}
                 </MenuList>
               </ClickAwayListener>
             </Paper>
