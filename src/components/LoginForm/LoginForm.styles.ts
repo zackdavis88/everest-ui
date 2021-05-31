@@ -7,7 +7,8 @@ export const useStyles = makeStyles(theme => ({
     position: "absolute",
     top: 0,
     left: 0,
-    zIndex: 10
+    zIndex: 10,
+    backgroundColor: "transparent"
   },
   box: {
     padding: "0 25px",
