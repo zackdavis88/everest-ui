@@ -13,5 +13,8 @@ export const useStyles = makeStyles((theme) => ({
   },
   itemEndIcon: {
     marginLeft: "5px"
+  },
+  popper: {
+    zIndex: theme.zIndex.appBar + 1
   }
 }));
