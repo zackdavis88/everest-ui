@@ -1,4 +1,4 @@
-import {useState, useEffect, ReactElement} from "react";
+import React, {useState, useEffect, ReactElement} from "react";
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
 import Grid from "@material-ui/core/Grid";
@@ -71,19 +71,19 @@ function Navbar(props: NavbarProps) {
   const navItems = [{
       name: "Blueprints",
       startIcon: <FontAwesomeIcon icon={faCubes} fixedWidth size="lg" />,
-      url: "/blueprints"
+      url: "/blueprints/"
     }, {
       name: "Components",
       startIcon: <FontAwesomeIcon icon={faCode} fixedWidth size="lg"/>,
-      url: "/components"
+      url: "/components/"
     }, {
       name: "Layouts",
       startIcon: <FontAwesomeIcon icon={faTh} fixedWidth size="lg"/>,
-      url: "/layouts"
+      url: "/layouts/"
     }, {
       name: "Fragments",
       startIcon: <FontAwesomeIcon icon={faLaptopCode} fixedWidth size="lg"/>,
-      url: "/fragments"
+      url: "/fragments/"
     }];
 
   const sidebarProps: {
@@ -120,7 +120,7 @@ function Navbar(props: NavbarProps) {
   }
 
   const renderBranding = () => (
-    <Link href={isAuthenticated ? "/home" : "/"}>
+    <Link href={isAuthenticated ? "/home/" : "/"}>
       <Typography component="a" variant="h4" className={classes.brandText}>
         <FontAwesomeIcon icon={faMountain} className={classes.brandIcon} />
         EVEREST
