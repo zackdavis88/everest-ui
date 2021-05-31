@@ -72,22 +72,22 @@ function Home(props: HomeProps) {
     icon: faCubes,
     title: "Blueprints",
     subtitle: "Define what the JSON structure of a component will look like.",
-    url: "/blueprints/"
+    url: "/blueprints"
   }, {
     icon: faCode,
     title: "Components",
     subtitle: "Create a component which follows a blueprint.",
-    url: "/components/"
+    url: "/components"
   }, {
     icon: faTh,
     title: "Layouts",
     subtitle: "Place your components on a page.",
-    url: "/layouts/"
+    url: "/layouts"
   }, {
     icon: faLaptopCode,
     title: "Fragments",
     subtitle: "Create a JSON blob that can be fetched by your application.",
-    url: "/fragments/"
+    url: "/fragments"
   }];
   const renderCard = (item) => (
     <Card elevation={3} className={classes.card}>
