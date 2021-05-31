@@ -81,6 +81,7 @@ const Menu = (props: MenuProps) => {
         startIcon={props.startIcon ? props.startIcon : null}
         onClick={handleToggle}
         disableRipple={typeof props.disableRipple === "boolean" ? props.disableRipple : false}
+        disableFocusRipple={typeof props.disableFocusRipple === "boolean" ? props.disableFocusRipple : false}
       >
         {props.menuName}
       </Button>

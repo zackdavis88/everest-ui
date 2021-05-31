@@ -55,6 +55,7 @@ function Navbar(props: NavbarProps) {
 
   const userMenuProps = {
     id: "navbar-user-menu",
+    disableFocusRipple: true,
     menuName: props.user && props.user.displayName || "My Account",
     menuItems: [{
       name: "Change Password",
