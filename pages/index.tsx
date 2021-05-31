@@ -19,7 +19,8 @@ const useStyles = makeStyles(theme => ({
   container: {
     marginTop: "25px",
     padding: "16px",
-    borderRadius: "5px"
+    borderRadius: "5px",
+    position: "relative"
   },
   box: {
     padding: "0 25px"
@@ -66,11 +67,13 @@ function Index(props: IndexProps) {
         <title>Everest | Login</title>
       </Head>
       <Container maxWidth="sm" className={classes.container}>
-        {showLoginForm ? (
+        {/* {showLoginForm ? (
           <LoginForm setShowLoginForm={setShowLoginForm} />
         ) : (
           <SignUpForm setShowLoginForm={setShowLoginForm} />
-        )}
+        )} */}
+        <LoginForm in={showLoginForm} setShowLoginForm={setShowLoginForm} />
+        <SignUpForm in={!showLoginForm} setShowLoginForm={setShowLoginForm} />
       </Container>
     </>
   );
