@@ -43,6 +43,47 @@ export const getAuthToken = async context => {
   };
 };
 
+export const ssrBlueprintsIndex = async context => {
+  if(!isServerReq(context.req))
+    return {props: {}};
+  
+  const cookies = cookie.parse(context.req.headers.cookie || "");
+  const reduxStore = initializeStore();
+  if(cookies.token){
+    const authRes = await fetch(`${apiConfig.host}:${apiConfig.port}/auth/token`, {headers: {"x-everest-token": cookies.token}});
+    const authBody = await authRes.json();
+    if(authRes.status === 200){
+      await reduxStore.dispatch({
+        type: "TOKEN_SUCCESS",
+        response: {body: authBody, headers: {"x-everest-token": cookies.token}}
+      });
+
+      const blueprintsRes = await fetch(`${apiConfig.host}:${apiConfig.port}/blueprints`, {headers: {"x-everest-token": cookies.token}});
+      const blueprintBody = await blueprintsRes.json();
+      if(blueprintsRes.status === 200){
+        await reduxStore.dispatch({
+          type: "BLUEPRINT_SUCCESS",
+          response: {body: blueprintBody}
+        });
+      }
+      else{
+        await reduxStore.dispatch({
+          type: "BLUEPRINT_FAILURE",
+          response: {body: blueprintBody}
+        });
+        await reduxStore.dispatch({
+          type: "SHOW_NOTIFICATION",
+          notification: {message: blueprintBody.error, type: "error"}
+        });
+      }
+    }
+  }
+  return {
+    props: {
+      initialReduxState: reduxStore.getState()
+    }
+  };
+};
 
 /**
  * Be careful using this hook. It only works because the number of
