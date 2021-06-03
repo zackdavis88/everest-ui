@@ -164,3 +164,17 @@ export const requireAuth = (PageComponent) => {
     showNotification
   })(AuthController);
 };
+
+const monthAbbreviations = [
+  "Jan", "Feb", "Mar", "Apr", "May", "Jun", 
+  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+];
+export const formatDate = (timestampString) => {
+  const timestamp = new Date(timestampString);
+  if(timestamp.toString() === "Invalid Date")
+    return "Invalid Date";
+  const monthName = monthAbbreviations[timestamp.getMonth()];
+  const dayNumber = timestamp.getDate();
+  const fullYear = timestamp.getFullYear();
+  return `${monthName} ${dayNumber}, ${fullYear}`;
+};
