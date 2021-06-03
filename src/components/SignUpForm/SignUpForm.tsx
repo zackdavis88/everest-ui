@@ -30,7 +30,7 @@ const SignUpForm = (props: SignUpFormProps) => {
     requestInProgress
   );
   const usernameField = {
-    id: "username-input",
+    id: "username-signup-input",
     required: true,
     type: "text",
     label: "Username",
@@ -47,7 +47,7 @@ const SignUpForm = (props: SignUpFormProps) => {
     }
   };
   const passwordField = {
-    id: "password-input",
+    id: "password-signup-input",
     required: true,
     type: "password",
     label: "Password",
@@ -64,7 +64,7 @@ const SignUpForm = (props: SignUpFormProps) => {
     }
   };
   const confirmField = {
-    id: "confirm-input",
+    id: "confirm-signup-input",
     required: true,
     type: "password",
     label: "Confirm Password",
