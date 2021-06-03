@@ -7,6 +7,8 @@ export interface MenuProps {
   startIcon?: ReactElement;
   disableRipple?: boolean;
   disableFocusRipple?: boolean;
+  useIconButton?: boolean;
+  placement?: string;
   menuItems: {
     name: string;
     onClick?: any;
