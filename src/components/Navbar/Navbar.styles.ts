@@ -51,5 +51,15 @@ export const useStyles = makeStyles((theme) => ({
     fontWeight: "bold",
     height: "64px",
     borderRadius: "0"
+  },
+  navIcon: {
+    "&.fa-sitemap": {
+      width: "35px"
+    }
+  },
+  menuIcon: {
+    "&.fa-caret-down": {
+      width: "12px"
+    }
   }
 }));

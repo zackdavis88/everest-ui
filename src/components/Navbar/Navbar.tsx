@@ -66,7 +66,7 @@ function Navbar(props: NavbarProps) {
       startIcon: <FontAwesomeIcon icon={faSignOutAlt} fixedWidth/>,
       onClick: () => props.logout()
     }],
-    endIcon: <FontAwesomeIcon icon={faCaretDown} fixedWidth/>
+    endIcon: <FontAwesomeIcon icon={faCaretDown} fixedWidth className={classes.menuIcon}/>
   };
 
   const navItems = [{
@@ -137,7 +137,7 @@ function Navbar(props: NavbarProps) {
         </IconButton>
       </Hidden>
       <Hidden implementation="css" smDown>
-        <Button variant="text" color="inherit" className={classes.navItem} startIcon={<FontAwesomeIcon icon={faSitemap} fixedWidth/>} onClick={toggleSidebar(!sidebarOpen)}>
+        <Button variant="text" color="inherit" className={classes.navItem} startIcon={<FontAwesomeIcon icon={faSitemap} fixedWidth size="sm" className={classes.navIcon}/>} onClick={toggleSidebar(!sidebarOpen)}>
           Navigation Menu
         </Button>
       </Hidden>
