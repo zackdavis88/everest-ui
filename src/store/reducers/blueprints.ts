@@ -11,6 +11,7 @@ const initialState = {
   blueprints: [],
   error: "",
   page: 1,
+  totalItems: 1,
   totalPages: 1,
   itemsPerPage: 10
 };
@@ -30,6 +31,7 @@ export default function blueprintsReducer(state=initialState, action) {
         error: "",
         page: action.response.body.page,
         totalPages: action.response.body.totalPages,
+        totalItems: action.response.body.totalItems,
         itemsPerPage: action.response.body.itemsPerPage
       };
     case BLUEPRINT_FAILURE:
@@ -40,6 +42,7 @@ export default function blueprintsReducer(state=initialState, action) {
         message: "",
         page: 1,
         totalPages: 1,
+        totalItems: 1,
         itemsPerPage: 10
       };
     case RESET_BLUEPRINTS:
