@@ -57,3 +57,12 @@ export const apiMiddleware = store => next => action => {
     }
   });
 };
+
+// TODO: fix the 'any' type and make it more specific.
+export const urlWithQuery = (reqUrl: string, query: any) => {
+  const url = new URL(reqUrl, window.location.origin);
+  Object.keys(query).forEach((key) => {
+    url.searchParams.append(key, query[key]);
+  });
+  return url.toString();
+};
