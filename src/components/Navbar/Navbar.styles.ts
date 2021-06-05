@@ -50,7 +50,8 @@ export const useStyles = makeStyles((theme) => ({
   navItem: {
     fontWeight: "bold",
     height: "64px",
-    borderRadius: "0"
+    borderRadius: "0",
+    padding: "6px 8px"
   },
   navIcon: {
     "&.fa-sitemap": {
