@@ -58,7 +58,9 @@ export const ssrBlueprintsIndex = async context => {
         response: {body: authBody, headers: {"x-everest-token": cookies.token}}
       });
 
-      const blueprintsRes = await fetch(`${apiConfig.host}:${apiConfig.port}/blueprints`, {headers: {"x-everest-token": cookies.token}});
+      const itemsPerPage = context.query.itemsPerPage || 10;
+      const page = context.query.page || 1;
+      const blueprintsRes = await fetch(`${apiConfig.host}:${apiConfig.port}/blueprints?itemsPerPage=${itemsPerPage}&page=${page}`, {headers: {"x-everest-token": cookies.token}});
       const blueprintBody = await blueprintsRes.json();
       if(blueprintsRes.status === 200){
         await reduxStore.dispatch({
