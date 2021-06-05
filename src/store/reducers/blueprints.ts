@@ -8,7 +8,7 @@ import {
 const initialState = {
   isLoading: false,
   message: "",
-  blueprints: [],
+  blueprints: null,
   error: "",
   page: 1,
   totalItems: 1,
@@ -38,7 +38,7 @@ export default function blueprintsReducer(state=initialState, action) {
       return {
         isLoading: false,
         error: action.response.body.error,
-        blueprints: [],
+        blueprints: null,
         message: "",
         page: 1,
         totalPages: 1,
