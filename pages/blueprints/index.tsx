@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import Head from "next/head";
 import Container from "@material-ui/core/Container";
 import Button from "@material-ui/core/Button";
@@ -13,10 +13,11 @@ import { formatDate } from "../../src/utils";
 import { getBlueprints, resetBlueprints } from "../../src/store/actions/blueprints";
 import Menu from "../../src/components/Menu/Menu";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEllipsisV} from "@fortawesome/free-solid-svg-icons";
+import { faEllipsisV } from "@fortawesome/free-solid-svg-icons";
 import { useRouter } from "next/router";
 import { Theme } from "@material-ui/core/styles"
 import Table from "../../src/components/Table/Table";
+import SearchBar from "../../src/components/SearchBar/SearchBar";
 
 const useStyles = makeStyles((theme: Theme) => ({
   container: {
@@ -64,6 +65,7 @@ interface BlueprintsIndexProps {
 function BlueprintsIndex(props: BlueprintsIndexProps) {
   const classes = useStyles(props);
   const router = useRouter();
+  const [searchInput, setSearchInput] = useState("");
 
   useEffect(() => {
     if(!props.blueprints)
@@ -84,9 +86,12 @@ function BlueprintsIndex(props: BlueprintsIndexProps) {
   });
 
   const onPaginationChange = (key: string) => (event: any, page: number) => {
+    const query = {...router.query};
     const url = new URL(window.location.pathname, window.location.origin);
     url.searchParams.append("page", props.page.toString());
     url.searchParams.append("itemsPerPage", props.itemsPerPage.toString());
+    if(query.filterName)
+      url.searchParams.append("filterName", query.filterName.toString());
     if(typeof page === "number" && key === "page")
       url.searchParams.set(key, (page + 1).toString());
     else {
@@ -95,8 +100,27 @@ function BlueprintsIndex(props: BlueprintsIndexProps) {
     router.push(url);
     return props.getBlueprints({
       itemsPerPage: url.searchParams.get("itemsPerPage"), 
-      page: url.searchParams.get("page")
-    })
+      page: url.searchParams.get("page"),
+      filterName: url.searchParams.get("filterName")
+    });
+  };
+
+  const onSubmit = (event: any) => {
+    event.preventDefault();
+    const query = router.query;
+    const url = new URL(window.location.pathname, window.location.origin);
+    if(searchInput)
+      url.searchParams.append("filterName", searchInput);
+    if(query.itemsPerPage)
+      url.searchParams.append("itemsPerPage", query.itemsPerPage.toString())
+    if(query.page)
+      url.searchParams.append("page", query.page.toString())
+    router.push(url);
+    return props.getBlueprints({
+      itemsPerPage: url.searchParams.get("itemsPerPage"), 
+      page: url.searchParams.get("page"),
+      filterName: url.searchParams.get("filterName")
+    });
   };
   
   const tableHeaders = [{
@@ -165,6 +189,12 @@ function BlueprintsIndex(props: BlueprintsIndexProps) {
             </Button>
           </Typography>
           <Divider />
+          <SearchBar
+            value={searchInput}
+            onSubmit={onSubmit}
+            onChange={(e) => setSearchInput(e.target.value)}
+            disabled={props.isLoading}
+          />
           <Table
             isLoading={props.isLoading}
             items={props.blueprints}
