@@ -7,7 +7,7 @@ export const useStyles = makeStyles((theme: Theme) => ({
     "& button": {
       height: "40px",
       margin: "0 0 0 8px",
-      padding: "3px 9px"
+      padding: "4px 10px"
     }
   }
 }));
