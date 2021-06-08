@@ -50,5 +50,12 @@ export const useStyles = makeStyles((theme: Theme) => ({
   },
   actionsContainer: {
     display: "flex"
+  },
+  tableEmptyContainer: {
+    color: theme.palette.common.white,
+    backgroundColor: theme.palette.info.main,
+    padding: "20px",
+    borderRadius: "5px",
+    margin: "16px 0 0 0"
   }
 }));

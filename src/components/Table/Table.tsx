@@ -11,6 +11,7 @@ import TableLoading from "./TableLoading";
 import TablePaginationActions from "./TablePaginationActions";
 import { useStyles } from "./Table.styles";
 import { TableProps } from "./Table.props";
+import TableEmpty from "./TableEmpty";
 
 const IndexTable = (props: TableProps) => {
   const classes = useStyles();
@@ -25,48 +26,52 @@ const IndexTable = (props: TableProps) => {
   return (
     <TableContainer className={classes.tableContainer} >
       {props.isLoading || !props.items ? <TableLoading /> : null}
-      <Table stickyHeader>
-        <TableHead>
-          <TableRow>
-            {props.headers.map(header => (
-              <TableCell key={header.key} className={hiddenClass(header.hidden)}>
-                {header.label}
-              </TableCell>
-              ))}
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {props.items && props.items.map((blueprint, index) => (
-            <TableRow hover tabIndex={-1} key={index}>
-              {props.columns.map((column, index) => {
-                const value = blueprint[column.key];
-                return column.key === "actions" ? (
-                  <TableCell key={index} className={hiddenClass(column.hidden)}>
-                    {column.format ? column.format(blueprint) : value}
-                  </TableCell>
-                ) : (
-                  <TableCell key={index} className={hiddenClass(column.hidden)}>
-                    {column.format ? column.format(value) : value}
-                  </TableCell>
-              )})}
+      {props.items.length ? (
+        <Table stickyHeader>
+          <TableHead>
+            <TableRow>
+              {props.headers.map(header => (
+                <TableCell key={header.key} className={hiddenClass(header.hidden)}>
+                  {header.label}
+                </TableCell>
+                ))}
             </TableRow>
-          ))}
-        </TableBody>
-        <TableFooter>
-          <TableRow>
-            <TablePagination
-              rowsPerPageOptions={[10, 25, 50]}
-              rowsPerPage={props.itemsPerPage}
-              onChangeRowsPerPage={props.onPaginationChange("itemsPerPage")}
-              page={props.page - 1}
-              ActionsComponent={TablePaginationActions}
-              count={props.totalItems}
-              onChangePage={props.onPaginationChange("page")}
-              labelRowsPerPage={"Items per page:"}
-            />
-          </TableRow>
-        </TableFooter>
-      </Table>
+          </TableHead>
+          <TableBody>
+            {props.items && props.items.map((blueprint, index) => (
+              <TableRow hover tabIndex={-1} key={index}>
+                {props.columns.map((column, index) => {
+                  const value = blueprint[column.key];
+                  return column.key === "actions" ? (
+                    <TableCell key={index} className={hiddenClass(column.hidden)}>
+                      {column.format ? column.format(blueprint) : value}
+                    </TableCell>
+                  ) : (
+                    <TableCell key={index} className={hiddenClass(column.hidden)}>
+                      {column.format ? column.format(value) : value}
+                    </TableCell>
+                )})}
+              </TableRow>
+            ))}
+          </TableBody>
+          <TableFooter>
+            <TableRow>
+              <TablePagination
+                rowsPerPageOptions={[10, 25, 50]}
+                rowsPerPage={props.itemsPerPage}
+                onChangeRowsPerPage={props.onPaginationChange("itemsPerPage")}
+                page={props.page - 1}
+                ActionsComponent={TablePaginationActions}
+                count={props.totalItems}
+                onChangePage={props.onPaginationChange("page")}
+                labelRowsPerPage={"Items per page:"}
+              />
+            </TableRow>
+          </TableFooter>
+        </Table>
+      ) : (
+        <TableEmpty />
+      )}
     </TableContainer>
   );
 };
