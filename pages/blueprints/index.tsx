@@ -18,7 +18,10 @@ import { useRouter } from "next/router";
 import { Theme } from "@material-ui/core/styles"
 import Table from "../../src/components/Table/Table";
 import SearchBar from "../../src/components/SearchBar/SearchBar";
-
+import { showNotification } from "../../src/store/actions/notification";
+// TODO: This is where you left off.
+// Check how this page responds with serverside rendering for all viewports and look for any CSS irregularities that need to be fixed.
+// Also; we need a clear button on the search bar.
 const useStyles = makeStyles((theme: Theme) => ({
   container: {
     marginTop: "25px",
@@ -60,18 +63,23 @@ interface BlueprintsIndexProps {
   totalItems: number;
   resetBlueprintsState: () => void;
   getBlueprints: (queryObject: any) => void;
+  showNotification: (message: string, type?: string) => void;
 };
 
 function BlueprintsIndex(props: BlueprintsIndexProps) {
   const classes = useStyles(props);
   const router = useRouter();
-  const [searchInput, setSearchInput] = useState("");
+  const [searchInput, setSearchInput] = useState(router.query.filterName || "");
 
   useEffect(() => {
     if(!props.blueprints)
       props.getBlueprints(router.query);
     return () => props.resetBlueprintsState();
   }, []);
+
+  useEffect(() => {
+    props.showNotification(props.error, "error");
+  }, [props.error]);
 
   const generateActionMenuProps = (blueprint) => ({
     id: `${blueprint.id}-actions`,
@@ -110,7 +118,7 @@ function BlueprintsIndex(props: BlueprintsIndexProps) {
     const query = router.query;
     const url = new URL(window.location.pathname, window.location.origin);
     if(searchInput)
-      url.searchParams.append("filterName", searchInput);
+      url.searchParams.append("filterName", searchInput.toString());
     if(query.itemsPerPage)
       url.searchParams.append("itemsPerPage", query.itemsPerPage.toString())
     if(query.page)
@@ -190,7 +198,7 @@ function BlueprintsIndex(props: BlueprintsIndexProps) {
           </Typography>
           <Divider />
           <SearchBar
-            value={searchInput}
+            value={searchInput.toString()}
             onSubmit={onSubmit}
             onChange={(e) => setSearchInput(e.target.value)}
             disabled={props.isLoading}
@@ -222,7 +230,8 @@ const ConnectedBlueprintsIndex = connect((state: RootState) => ({
   totalItems: state.blueprints.totalItems
 }), {
   resetBlueprintsState: resetBlueprints,
-  getBlueprints
+  getBlueprints,
+  showNotification
 })(BlueprintsIndex);
 
 export default requireAuth(ConnectedBlueprintsIndex);
