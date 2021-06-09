@@ -77,7 +77,8 @@ function BlueprintsIndex(props: BlueprintsIndexProps) {
   }, []);
 
   useEffect(() => {
-    props.showNotification(props.error, "error");
+    if(props.error)
+      props.showNotification(props.error, "error");
   }, [props.error]);
 
   const onPaginationChange = (key: string) => (event: any, page: number) => {
