@@ -60,7 +60,7 @@ interface BlueprintsIndexProps {
   page: number;
   itemsPerPage: number;
   totalItems: number;
-  resetBlueprintsState: () => void;
+  resetBlueprints: () => void;
   getBlueprints: (queryObject: any) => void;
   showNotification: (message: string, type?: string) => void;
 };
@@ -73,7 +73,7 @@ function BlueprintsIndex(props: BlueprintsIndexProps) {
   useEffect(() => {
     if(!props.blueprints)
       props.getBlueprints(router.query);
-    return () => props.resetBlueprintsState();
+    return () => props.resetBlueprints();
   }, []);
 
   useEffect(() => {
@@ -251,7 +251,7 @@ const ConnectedBlueprintsIndex = connect((state: RootState) => ({
   itemsPerPage: state.blueprints.itemsPerPage,
   totalItems: state.blueprints.totalItems
 }), {
-  resetBlueprintsState: resetBlueprints,
+  resetBlueprints,
   getBlueprints,
   showNotification
 })(BlueprintsIndex);
