@@ -26,7 +26,7 @@ const IndexTable = (props: TableProps) => {
   return (
     <TableContainer className={classes.tableContainer} >
       {props.isLoading || !props.items ? <TableLoading /> : null}
-      {props.items.length ? (
+      {props.items && props.items.length ? (
         <Table stickyHeader>
           <TableHead>
             <TableRow>

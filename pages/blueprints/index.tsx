@@ -19,9 +19,7 @@ import { Theme } from "@material-ui/core/styles"
 import Table from "../../src/components/Table/Table";
 import SearchBar from "../../src/components/SearchBar/SearchBar";
 import { showNotification } from "../../src/store/actions/notification";
-// TODO: This is where you left off.
-// Check how this page responds with serverside rendering for all viewports and look for any CSS irregularities that need to be fixed.
-// Also; we need a clear button on the search bar.
+
 const useStyles = makeStyles((theme: Theme) => ({
   container: {
     marginTop: "25px",
@@ -105,7 +103,7 @@ function BlueprintsIndex(props: BlueprintsIndexProps) {
     else {
       url.searchParams.set(key, event.target.value)
     }
-    router.push(url);
+    router.push(url, undefined, {shallow: true});
     return props.getBlueprints({
       itemsPerPage: url.searchParams.get("itemsPerPage"), 
       page: url.searchParams.get("page"),
@@ -123,7 +121,7 @@ function BlueprintsIndex(props: BlueprintsIndexProps) {
       url.searchParams.append("itemsPerPage", query.itemsPerPage.toString())
     if(query.page)
       url.searchParams.append("page", query.page.toString())
-    router.push(url);
+    router.push(url, undefined, {shallow: true});
     return props.getBlueprints({
       itemsPerPage: url.searchParams.get("itemsPerPage"), 
       page: url.searchParams.get("page"),
@@ -200,7 +198,26 @@ function BlueprintsIndex(props: BlueprintsIndexProps) {
           <SearchBar
             value={searchInput.toString()}
             onSubmit={onSubmit}
-            onChange={(e) => setSearchInput(e.target.value)}
+            onChange={(e) => {
+              e.preventDefault();
+              if(e.nativeEvent instanceof InputEvent)
+                return setSearchInput(e.target.value);
+
+              // if we hit this block of code, then a user clicked the search clear button.
+              setSearchInput("");
+              const query = router.query;
+              const url = new URL(window.location.pathname, window.location.origin);
+              if(query.itemsPerPage)
+                url.searchParams.append("itemsPerPage", query.itemsPerPage.toString())
+              if(query.page)
+                url.searchParams.append("page", query.page.toString())
+              router.push(url);
+              return props.getBlueprints({
+                itemsPerPage: url.searchParams.get("itemsPerPage"), 
+                page: url.searchParams.get("page"),
+                filterName: url.searchParams.get("filterName")
+              });
+            }}
             disabled={props.isLoading}
           />
           <Table

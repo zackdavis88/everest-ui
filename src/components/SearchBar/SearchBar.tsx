@@ -11,10 +11,10 @@ const SearchBar = (props: SearchBarProps) => {
     <form noValidate autoComplete="off" className={classes.searchContainer} onSubmit={props.onSubmit}>
       <Grid container direction="row">
         <Grid item xs={8} sm={6} md={4}>
-          <TextField variant="outlined" type="text" size="small" color="primary" label="Name Search" placeholder="Enter a blueprint name" fullWidth disabled={props.disabled} value={props.value} onChange={props.onChange} />
+          <TextField variant="outlined" type="search" size="small" color="primary" label="Name Search" placeholder="Enter a blueprint name" fullWidth disabled={props.disabled} value={props.value} onChange={props.onChange} />
         </Grid>
         <Grid item xs={3} sm={3} md={2}>
-          <Button variant="contained" size="small" fullWidth color="primary" disabled={props.disabled} type="submit">
+          <Button variant="contained" size="small" fullWidth color="primary" disabled={props.disabled} type="submit" disableRipple>
             Search
           </Button>
         </Grid>

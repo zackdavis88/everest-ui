@@ -38,17 +38,20 @@ const TablePaginationActions = (props: TablePaginationActionsProps) => {
           onClick={handleFirstPageButtonClick}
           disabled={page === 0}
           aria-label="first page"
+          disableRipple
         >
           {theme.direction === 'rtl' ? <FontAwesomeIcon icon={faStepForward} fixedWidth size="xs" className={classes.paginationIcon} /> : <FontAwesomeIcon icon={faStepBackward} fixedWidth size="xs" className={classes.paginationIcon}/>}
         </IconButton>
         <IconButton 
           onClick={handleBackButtonClick} 
           disabled={page === 0} 
+          disableRipple
           aria-label="previous page">
           {theme.direction === 'rtl' ? <FontAwesomeIcon icon={faChevronRight} fixedWidth size="xs" className={classes.paginationIcon} /> : <FontAwesomeIcon icon={faChevronLeft} fixedWidth size="xs" className={classes.paginationIcon}/>}
         </IconButton>
         <IconButton
           onClick={handleNextButtonClick}
+          disableRipple
           disabled={page >= Math.ceil(count / rowsPerPage) - 1}
           aria-label="next page"
         >
@@ -56,6 +59,7 @@ const TablePaginationActions = (props: TablePaginationActionsProps) => {
         </IconButton>
         <IconButton
           onClick={handleLastPageButtonClick}
+          disableRipple
           disabled={page >= Math.ceil(count / rowsPerPage) - 1}
           aria-label="last page"
         >
