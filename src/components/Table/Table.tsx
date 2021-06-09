@@ -70,7 +70,7 @@ const IndexTable = (props: TableProps) => {
           </TableFooter>
         </Table>
       ) : (
-        <TableEmpty />
+        props.items ? <TableEmpty /> : <div style={{minHeight: "75px"}}></div>
       )}
     </TableContainer>
   );

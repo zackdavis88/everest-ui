@@ -218,7 +218,7 @@ function BlueprintsIndex(props: BlueprintsIndexProps) {
                 filterName: url.searchParams.get("filterName")
               });
             }}
-            disabled={props.isLoading}
+            disabled={props.isLoading || !props.blueprints}
           />
           <Table
             isLoading={props.isLoading}
