@@ -151,12 +151,12 @@ function BlueprintsIndex(props: BlueprintsIndexProps) {
     format: (data) => {
       return (
         <>
-          <Tooltip title="View / Edit" placement="top">
+          <Tooltip title="View / Edit" placement="top" aira-label="view or edit blueprint">
             <IconButton size="small" onClick={() => router.push(`/blueprints/${data.id}`)}>
               <FontAwesomeIcon icon={faEdit} size="sm" />
             </IconButton>
           </Tooltip>
-          <Tooltip title="Delete" placement="top">
+          <Tooltip title="Delete" placement="top" aria-label="delete blueprint">
             <IconButton size="small" style={{margin: "0 0 0 16px"}} onClick={() => console.log(`Delete Clicked ${data.id}`)}>
               <FontAwesomeIcon icon={faTrash} size="sm" />
             </IconButton>
@@ -203,6 +203,7 @@ function BlueprintsIndex(props: BlueprintsIndexProps) {
           <SearchBar
             value={searchInput.toString()}
             onSubmit={onSubmit}
+            disabled={props.isLoading || !props.blueprints}
             onChange={(e) => {
               e.preventDefault();
               if(e.nativeEvent instanceof InputEvent)
@@ -223,7 +224,6 @@ function BlueprintsIndex(props: BlueprintsIndexProps) {
                 filterName: url.searchParams.get("filterName")
               });
             }}
-            disabled={props.isLoading || !props.blueprints}
           />
           <Table
             isLoading={props.isLoading}
