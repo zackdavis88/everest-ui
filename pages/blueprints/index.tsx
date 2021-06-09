@@ -11,14 +11,15 @@ import { requireAuth, ssrBlueprintsIndex } from "../../src/utils";
 import { RootState } from "../../src/store/store";
 import { formatDate } from "../../src/utils";
 import { getBlueprints, resetBlueprints } from "../../src/store/actions/blueprints";
-import Menu from "../../src/components/Menu/Menu";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEllipsisV } from "@fortawesome/free-solid-svg-icons";
+import { faEdit, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { useRouter } from "next/router";
 import { Theme } from "@material-ui/core/styles"
 import Table from "../../src/components/Table/Table";
 import SearchBar from "../../src/components/SearchBar/SearchBar";
 import { showNotification } from "../../src/store/actions/notification";
+import IconButton from "@material-ui/core/IconButton";
+import Tooltip from '@material-ui/core/Tooltip';
 
 const useStyles = makeStyles((theme: Theme) => ({
   container: {
@@ -78,18 +79,6 @@ function BlueprintsIndex(props: BlueprintsIndexProps) {
   useEffect(() => {
     props.showNotification(props.error, "error");
   }, [props.error]);
-
-  const generateActionMenuProps = (blueprint) => ({
-    id: `${blueprint.id}-actions`,
-    menuName: "",
-    startIcon: <FontAwesomeIcon icon={faEllipsisV} fixedWidth size="xs" />,
-    menuItems: [{
-      name: "Details",
-      url: `/blueprints/${blueprint.id}`
-    }],
-    useIconButton: true,
-    placement: "left"
-  });
 
   const onPaginationChange = (key: string) => (event: any, page: number) => {
     const query = {...router.query};
@@ -158,7 +147,22 @@ function BlueprintsIndex(props: BlueprintsIndexProps) {
 
   const tableColumns = [{
     key: "actions",
-    format: (data) => <Menu {...generateActionMenuProps(data)} />
+    format: (data) => {
+      return (
+        <>
+          <Tooltip title="View / Edit" placement="top">
+            <IconButton size="small" onClick={() => router.push(`/blueprints/${data.id}`)}>
+              <FontAwesomeIcon icon={faEdit} size="sm" />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Delete" placement="top">
+            <IconButton size="small" style={{margin: "0 0 0 16px"}} onClick={() => console.log(`Delete Clicked ${data.id}`)}>
+              <FontAwesomeIcon icon={faTrash} size="sm" />
+            </IconButton>
+          </Tooltip>
+        </>
+      )
+    }
   }, {
     key: "id",
     hidden: "md"

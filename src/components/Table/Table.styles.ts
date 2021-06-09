@@ -18,8 +18,11 @@ export const useStyles = makeStyles((theme: Theme) => ({
         flex: "none"
       }
     },
-    "& .fa-ellipsis-v": {
-      width: "8px"
+    "& .fa-edit": {
+      width: "1.125em"
+    },
+    "& .fa-trash": {
+      width: "1.125em"
     },
     "& #table-loading-overlay": {
       width: "100%",
