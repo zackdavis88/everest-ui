@@ -198,7 +198,7 @@ function BlueprintsIndex(props: BlueprintsIndexProps) {
         <Container maxWidth="lg" className={classes.container}>
           <Typography variant="h4" className={classes.title} component="div">
             Blueprints
-            <Button color="primary" variant="outlined" size="small" className={classes.button}>
+            <Button color="primary" variant="outlined" size="small" className={classes.button} onClick={() => router.push("/blueprints/create")}>
               Create Blueprint
             </Button>
           </Typography>
