@@ -10,7 +10,7 @@ import { connect } from "react-redux";
 import { requireAuth, ssrBlueprintsIndex } from "../../src/utils";
 import { RootState } from "../../src/store/store";
 import { formatDate } from "../../src/utils";
-import { getBlueprints, resetBlueprints } from "../../src/store/actions/blueprints";
+import { getBlueprints, resetBlueprints, deleteBlueprint } from "../../src/store/actions/blueprints";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEdit, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { useRouter } from "next/router";
@@ -20,6 +20,7 @@ import SearchBar from "../../src/components/SearchBar/SearchBar";
 import { showNotification } from "../../src/store/actions/notification";
 import IconButton from "@material-ui/core/IconButton";
 import Tooltip from '@material-ui/core/Tooltip';
+import DeleteBlueprintModal from "../../src/components/DeleteModal/DeleteModal";
 
 const useStyles = makeStyles((theme: Theme) => ({
   container: {
@@ -62,6 +63,7 @@ interface BlueprintsIndexProps {
   totalItems: number;
   resetBlueprints: () => void;
   getBlueprints: (queryObject: any) => void;
+  deleteBlueprint: (id: string, confirmInput: string) => void;
   showNotification: (message: string, type?: string) => void;
 };
 
@@ -69,6 +71,7 @@ function BlueprintsIndex(props: BlueprintsIndexProps) {
   const classes = useStyles(props);
   const router = useRouter();
   const [searchInput, setSearchInput] = useState(router.query.filterName || "");
+  const [modalData, setModalData] = useState({isOpen: false, blueprint: {id: "", name: ""}});
 
   useEffect(() => {
     if(!props.blueprints)
@@ -157,7 +160,7 @@ function BlueprintsIndex(props: BlueprintsIndexProps) {
             </IconButton>
           </Tooltip>
           <Tooltip title="Delete" placement="top" aria-label="delete blueprint">
-            <IconButton size="small" style={{margin: "0 0 0 16px"}} onClick={() => console.log(`Delete Clicked ${data.id}`)}>
+            <IconButton size="small" style={{margin: "0 0 0 16px"}} onClick={() => setModalData({isOpen: true, blueprint: data})}>
               <FontAwesomeIcon icon={faTrash} size="sm" />
             </IconButton>
           </Tooltip>
@@ -237,6 +240,18 @@ function BlueprintsIndex(props: BlueprintsIndexProps) {
           />
         </Container>
       )}
+      <DeleteBlueprintModal
+        isOpen={modalData.isOpen}
+        handleClose={(refresh: boolean) => {
+          setModalData({isOpen: false, blueprint: {id: "", name: ""}})
+          if(refresh)
+            props.getBlueprints(router.query);
+        }}
+        deleteResource={props.deleteBlueprint}
+        resource={modalData.blueprint}
+        showNotification={props.showNotification}
+        resourceType={"Blueprint"}
+      />
     </>
   );
 };
@@ -253,6 +268,7 @@ const ConnectedBlueprintsIndex = connect((state: RootState) => ({
 }), {
   resetBlueprints,
   getBlueprints,
+  deleteBlueprint,
   showNotification
 })(BlueprintsIndex);
 

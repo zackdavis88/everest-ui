@@ -10,3 +10,14 @@ export const getBlueprints = (query) => dispatch => dispatch({
   types: [BLUEPRINT_REQUEST, BLUEPRINT_SUCCESS, BLUEPRINT_FAILURE],
   reqUrl: urlWithQuery("/api/blueprints", query)
 });
+
+export const deleteBlueprint = (id: string, confirmInput: string) => dispatch => dispatch({
+  types: ["BLUEPRINT_REQUEST_NO_OP", "BLUEPRINT_SUCCESS_NO_OP", "BLUEPRINT_FAILURE_NO_OP"], // Bypassing all state processing for this action using NO_OP
+  reqUrl: `/api/blueprints/${id}`,
+  reqOptions: {
+    method: "DELETE"
+  },
+  payload: {
+    confirm: confirmInput
+  }
+});
