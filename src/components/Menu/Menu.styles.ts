@@ -7,6 +7,8 @@ export const useStyles = makeStyles((theme) => ({
       textTransform: "none",
       fontWeight: "bold",
       fontSize: "14px",
+      color: "inherit",
+      padding: "6px 8px",
       "&:focus": {
         backgroundColor: fade(theme.palette.common.white, 0.1)
       }

@@ -43,6 +43,53 @@ export const getAuthToken = async context => {
   };
 };
 
+export const ssrBlueprintsIndex = async context => {
+  if(!isServerReq(context.req))
+    return {props: {}};
+  
+  const cookies = cookie.parse(context.req.headers.cookie || "");
+  const reduxStore = initializeStore();
+  if(cookies.token){
+    const authRes = await fetch(`${apiConfig.host}:${apiConfig.port}/auth/token`, {headers: {"x-everest-token": cookies.token}});
+    const authBody = await authRes.json();
+    if(authRes.status === 200){
+      await reduxStore.dispatch({
+        type: "TOKEN_SUCCESS",
+        response: {body: authBody, headers: {"x-everest-token": cookies.token}}
+      });
+
+      const itemsPerPage = context.query.itemsPerPage || 10;
+      const page = context.query.page || 1;
+      const filterName = context.query.filterName;
+      let url = `${apiConfig.host}:${apiConfig.port}/blueprints?itemsPerPage=${itemsPerPage}&page=${page}`;
+      if(filterName)
+        url = `${url}&filterName=${filterName}`;
+      const blueprintsRes = await fetch(url, {headers: {"x-everest-token": cookies.token}});
+      const blueprintBody = await blueprintsRes.json();
+      if(blueprintsRes.status === 200){
+        await reduxStore.dispatch({
+          type: "BLUEPRINT_SUCCESS",
+          response: {body: blueprintBody}
+        });
+      }
+      else{
+        await reduxStore.dispatch({
+          type: "BLUEPRINT_FAILURE",
+          response: {body: blueprintBody}
+        });
+        await reduxStore.dispatch({
+          type: "SHOW_NOTIFICATION",
+          notification: {message: blueprintBody.error, type: "error"}
+        });
+      }
+    }
+  }
+  return {
+    props: {
+      initialReduxState: reduxStore.getState()
+    }
+  };
+};
 
 /**
  * Be careful using this hook. It only works because the number of
@@ -122,4 +169,18 @@ export const requireAuth = (PageComponent) => {
   }), {
     showNotification
   })(AuthController);
+};
+
+const monthAbbreviations = [
+  "Jan", "Feb", "Mar", "Apr", "May", "Jun", 
+  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+];
+export const formatDate = (timestampString) => {
+  const timestamp = new Date(timestampString);
+  if(timestamp.toString() === "Invalid Date")
+    return "Invalid Date";
+  const monthName = monthAbbreviations[timestamp.getMonth()];
+  const dayNumber = timestamp.getDate();
+  const fullYear = timestamp.getFullYear();
+  return `${monthName} ${dayNumber}, ${fullYear}`;
 };

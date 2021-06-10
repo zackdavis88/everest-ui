@@ -26,7 +26,7 @@ const LoginForm = (props: LoginFormProps) => {
   const router = useRouter();
   const submitDisabled = () => !(usernameInput && passwordInput) || props.authInProgress;
   const usernameField = {
-    id: "username-input",
+    id: "username-login-input",
     required: true,
     type: "text",
     label: "Username",
@@ -41,7 +41,7 @@ const LoginForm = (props: LoginFormProps) => {
     }
   };
   const passwordField = {
-    id: "password-input",
+    id: "password-login-input",
     required: true,
     type: "password",
     label: "Password",

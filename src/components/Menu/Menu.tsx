@@ -3,12 +3,13 @@ import Button from "@material-ui/core/Button";
 import ClickAwayListener from "@material-ui/core/ClickAwayListener";
 import Grow from "@material-ui/core/Grow";
 import Paper from "@material-ui/core/Paper";
-import Popper from "@material-ui/core/Popper";
+import Popper, {PopperPlacementType} from "@material-ui/core/Popper";
 import MenuItem from "@material-ui/core/MenuItem";
 import MenuList from "@material-ui/core/MenuList";
 import { useStyles } from "./Menu.styles";
 import { MenuProps } from "./Menu.props";
 import Link from "next/link";
+import { IconButton } from "@material-ui/core";
 
 const Menu = (props: MenuProps) => {
   const classes = useStyles(props);
@@ -70,22 +71,31 @@ const Menu = (props: MenuProps) => {
     );
   };
 
+  const anchorProps = {
+    ref: anchorRef,
+    "aria-controls": open ? props.id : undefined,
+    "aria-haspopup": true,
+    onClick: handleToggle,
+    disableRipple: typeof props.disableRipple === "boolean" ? props.disableRipple : false,
+    disableFocusRipple: typeof props.disableFocusRipple === "boolean" ? props.disableFocusRipple : false
+  };
+  if(!props.useIconButton){
+    anchorProps["endIcon"] = props.endIcon ? props.endIcon : null;
+    anchorProps["startIcon"] = props.startIcon ? props.startIcon : null;
+  }
+
   return (
     <div className={classes.root} id={props.id}>
-      <Button
-        ref={anchorRef}
-        aria-controls={open ? props.id : undefined}
-        aria-haspopup="true"
-        color="inherit"
-        endIcon={props.endIcon ? props.endIcon : null}
-        startIcon={props.startIcon ? props.startIcon : null}
-        onClick={handleToggle}
-        disableRipple={typeof props.disableRipple === "boolean" ? props.disableRipple : false}
-        disableFocusRipple={typeof props.disableFocusRipple === "boolean" ? props.disableFocusRipple : false}
-      >
-        {props.menuName}
-      </Button>
-      <Popper open={open} anchorEl={anchorRef.current} role={undefined} disablePortal transition placement="bottom-end" className={classes.popper}>
+      {props.useIconButton && props.startIcon ? (
+        <IconButton {...anchorProps}>
+          {props.startIcon}
+        </IconButton>
+      ) : (
+        <Button {...anchorProps}>
+          {props.menuName}
+        </Button>
+      )}
+      <Popper open={open} anchorEl={anchorRef.current} role={undefined} disablePortal transition placement={props.placement as PopperPlacementType || "bottom-end"} className={classes.popper}>
         {({ TransitionProps, placement }) => (
           <Grow
             {...TransitionProps}
