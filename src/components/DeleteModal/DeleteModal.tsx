@@ -1,6 +1,6 @@
 import TextField from "@material-ui/core/TextField";
 import Typography from "@material-ui/core/Typography";
-import React, { useState, useEffect, forwardRef } from "react";
+import React, { useState, useEffect } from "react";
 import { DeleteModalProps } from "./DeleteModal.props";
 import { useWidth } from "../../utils";
 import DialogModal from "../DialogModal/DialogModal";
