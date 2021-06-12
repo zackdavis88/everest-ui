@@ -1,33 +1,14 @@
-import Dialog from "@material-ui/core/Dialog";
-import DialogTitle from '@material-ui/core/DialogTitle';
-import DialogContent from '@material-ui/core/DialogContent';
-import DialogActions from '@material-ui/core/DialogActions';
 import TextField from "@material-ui/core/TextField";
-import Typography from "@material-ui/core/Typography";
-import IconButton from "@material-ui/core/IconButton";
-import Button from "@material-ui/core/Button";
-import { faTimes } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import React, { useState, useEffect, forwardRef } from "react";
-import { useStyles } from "./ChangePasswordModal.styles";
+import React, { useState, useEffect } from "react";
 import { ChangePasswordModalProps } from "./ChangePasswordModal.props";
 import { updatePassword } from "../../store/actions/user";
 import { showNotification } from "../../store/actions/notification";
 import { connect } from "react-redux";
 import { RootState } from "../../store/store";
-import Slide from '@material-ui/core/Slide';
-import { TransitionProps } from "@material-ui/core/transitions/transition";
 import { useWidth } from "../../utils";
-
-const SlideTransition = forwardRef(function Transition(
-  props: TransitionProps & { children?: React.ReactElement<any, any> },
-  ref: React.Ref<unknown>,
-) {
-  return <Slide direction="up" ref={ref} {...props} />;
-});
+import DialogModal from "../DialogModal/DialogModal";
 
 const ChangePasswordModal = (props: ChangePasswordModalProps) => {
-  const classes = useStyles(props);
   const breakpoint = useWidth();
   const [currentInput, setCurrentInput] = useState({value: "", error: ""});
   const [newInput, setNewInput] = useState({value: "", error: ""});
@@ -116,31 +97,21 @@ const ChangePasswordModal = (props: ChangePasswordModalProps) => {
   };
 
   return (
-    <Dialog onClose={props.handleClose} aria-labelledby="change-password-modal" open={props.isOpen} maxWidth="sm" fullWidth TransitionComponent={SlideTransition} fullScreen={breakpoint === "xs"}>
-      <DialogTitle id="change-password-modal" disableTypography className={classes.dialogTitle}>
-        <Typography variant="h6">
-          Change Password
-        </Typography>
-        <IconButton aria-label="close" className={classes.closeButton} onClick={props.handleClose}>
-          <FontAwesomeIcon icon={faTimes} fixedWidth />
-        </IconButton>
-      </DialogTitle>
-      <form noValidate autoComplete="off" onSubmit={onSubmit}>
-        <DialogContent dividers className={classes.dialogContent}>
-            <TextField variant="filled" {...currentFieldProps} />
-            <TextField variant="filled" {...newFieldProps} />
-            <TextField variant="filled" {...confirmFieldProps} />
-        </DialogContent>
-        <DialogActions className={classes.dialogActions}>
-          <Button variant="contained" color="primary" fullWidth size="large" type="submit" disabled={submitDisabled}>
-            Submit
-          </Button>
-          <Button autoFocus variant="outlined" onClick={props.handleClose} color="primary" fullWidth size="large">
-            Cancel
-          </Button>
-        </DialogActions>
-      </form>
-    </Dialog>
+    <DialogModal
+      title="Change Password"
+      isOpen={props.isOpen}
+      handleClose={props.handleClose}
+      onSubmit={onSubmit}
+      maxWidth="sm"
+      id="change-password-modal"
+      fullscreen={breakpoint === "xs"}
+      submitDisabled={submitDisabled}
+      isForm={true}
+    >
+      <TextField variant="filled" {...currentFieldProps} />
+      <TextField variant="filled" {...newFieldProps} />
+      <TextField variant="filled" {...confirmFieldProps} />
+    </DialogModal>
   );
 };
 

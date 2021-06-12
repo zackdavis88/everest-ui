@@ -13,10 +13,7 @@ export const useStyles = makeStyles((theme) => ({
   },
   dialogContent: {
     "& > div": {
-      margin: "0 0 12px 0"
-    },
-    "& > div:first-of-type": {
-      color: theme.palette.error.main
+      margin: "0 0 16px 0"
     },
     "& > div:last-of-type": {
       margin: "0"
