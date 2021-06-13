@@ -46,6 +46,9 @@ const theme = createMuiTheme({
       light: green["700"],
       main: green["800"],
       dark: green["900"]
+    },
+    background: {
+      default: "#FAFAFA"
     }
   }
 });
