@@ -37,10 +37,12 @@ const AddFieldModal = (props: AddFieldModalProps) => {
       id="add-field-modal"
       fullscreen={breakpoint === "xs"}
       submitDisabled={!selectedType}
+      autoFocus={false}
     >
       <FormControl variant="filled" fullWidth>
         <InputLabel id="add-field-select-label">Field Type</InputLabel>
         <Select
+          autoFocus
           labelId="add-field-select-label"
           id="add-field-select"
           value={selectedType}
