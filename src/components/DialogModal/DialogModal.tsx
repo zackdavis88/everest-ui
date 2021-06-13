@@ -23,6 +23,7 @@ const SlideTransition = forwardRef(function Transition(
 const DialogModal = (props: DialogModalProps) => {
   const classes = useStyles(props);
   const renderBodyAndActions = () => {
+    const cancelBtnAutoFocus = typeof props.autoFocus === "boolean" ? props.autoFocus : true;
     return (
       <>
         <DialogContent dividers className={classes.dialogContent}>
@@ -32,7 +33,7 @@ const DialogModal = (props: DialogModalProps) => {
           <Button variant="contained" color="primary" fullWidth size="large" disabled={props.submitDisabled} type={props.isForm ? "submit" : "button"} onClick={props.isForm ? null : props.onSubmit}>
             Submit
           </Button>
-          <Button autoFocus variant="outlined" onClick={props.handleClose} color="primary" fullWidth size="large">
+          <Button autoFocus={cancelBtnAutoFocus} variant="outlined" onClick={props.handleClose} color="primary" fullWidth size="large">
             Cancel
           </Button>
         </DialogActions>

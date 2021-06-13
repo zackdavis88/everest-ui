@@ -9,4 +9,5 @@ export interface DialogModalProps{
   maxWidth: "xs" | "sm" | "md" | "lg" | "xl";
   id?: string;
   title: string;
+  autoFocus?: boolean;
 };
