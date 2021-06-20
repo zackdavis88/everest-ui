@@ -1,6 +1,11 @@
 import {makeStyles} from "@material-ui/core";
 
 export const useStyles = makeStyles((theme) => ({
+  appbar: {
+    "&.MuiAppBar-positionSticky": {
+      top: 0
+    }
+  },
   toolbar: {
     height: "64px",
     position: "relative"
