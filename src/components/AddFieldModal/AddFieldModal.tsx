@@ -6,14 +6,24 @@ import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
 import InputLabel from "@material-ui/core/InputLabel";
 import MenuItem from "@material-ui/core/MenuItem";
+import TextField from "@material-ui/core/TextField";
 
 const AddFieldModal = (props: AddFieldModalProps) => {
   const breakpoint = useWidth();
+  const [nameInput, setNameInput] = useState("");
   const [selectedType, setSelectedType] = useState("");
-
+  
   useEffect(() => {
-    return () => setSelectedType(""); // reset state value when the modal unmounts (closes).
+    return () => {
+      setNameInput("");
+      setSelectedType("");
+    }; // reset state value when the modal unmounts (closes).
   }, []);
+
+  const handleClose = () => {
+    setNameInput(""); // just resetting name here. Not resetting type provides a good UX in my opinion...for now.
+    props.handleClose();
+  };
 
   const fieldTypes = [
     "String",
@@ -24,25 +34,37 @@ const AddFieldModal = (props: AddFieldModalProps) => {
     "Object"
   ];
 
+  const nameInputProps = {
+    label: "Field Name",
+    value: nameInput,
+    onChange: (event: any) => setNameInput(event.target.value),
+    variant: "filled" as "filled",
+    fullWidth: true,
+    required: true,
+    inputProps: { maxLength: 100 }
+  };
+
   return (
     <DialogModal
       title="Add Blueprint Field"
       isOpen={props.isOpen}
-      handleClose={props.handleClose}
-      onSubmit={() => {
-        props.handleClose();
-        props.onSubmit(selectedType);
+      handleClose={handleClose}
+      onSubmit={(event: any) => {
+        event.preventDefault();
+        handleClose();
+        props.onSubmit(nameInput, selectedType);
       }}
       maxWidth="sm"
       id="add-field-modal"
       fullscreen={breakpoint === "xs"}
-      submitDisabled={!selectedType}
+      submitDisabled={!selectedType || !nameInput}
       autoFocus={false}
+      isForm={true}
     >
+      <TextField {...nameInputProps} autoFocus/>
       <FormControl variant="filled" fullWidth>
         <InputLabel id="add-field-select-label">Field Type</InputLabel>
         <Select
-          autoFocus
           labelId="add-field-select-label"
           id="add-field-select"
           value={selectedType}
