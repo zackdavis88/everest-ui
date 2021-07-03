@@ -23,13 +23,18 @@ import { v4 as uuidv4 } from 'uuid';
 import Accordion from '@material-ui/core/Accordion';
 import AccordionSummary from '@material-ui/core/AccordionSummary';
 import AccordionDetails from '@material-ui/core/AccordionDetails';
+import FormControlLabel from "@material-ui/core/FormControlLabel/FormControlLabel";
+import Switch from '@material-ui/core/Switch';
 
 const useStyles = makeStyles((theme: Theme) => ({
   container: {
     marginTop: "0",
     padding: "0 16px 16px 16px",
     borderRadius: "5px",
-    position: "relative"
+    position: "relative",
+    "& h6": {
+      margin: "16px 0 0 0"
+    }
   },
   title: {
     position: "sticky",
@@ -89,12 +94,12 @@ const useStyles = makeStyles((theme: Theme) => ({
     "& > .MuiAccordionSummary-root": {
       backgroundColor: fade(theme.palette.common.black, .12),
       minHeight: 56,
-      position: "relative",
       "& .MuiTypography-subtitle1": {
         maxWidth: "800px",
         textOverflow: "ellipsis",
         whiteSpace: "nowrap",
         overflow: "hidden",
+        fontWeight: "bold",
         [theme.breakpoints.down(theme.breakpoints.values.md)]: {
           maxWidth: "450px"
         },
@@ -102,25 +107,55 @@ const useStyles = makeStyles((theme: Theme) => ({
           maxWidth: "275px"
         }
       },
-      "& .MuiTypography-caption": {
-        position: "absolute",
-        left: "16px",
-        bottom: "0px",
-        fontWeight: "bold"
-      },
       "&.Mui-expanded": {
         color: theme.palette.common.white,
         backgroundColor: theme.palette.primary.main,
         "& > .MuiIconButton-root": {
           color: theme.palette.common.white
-        },
-        "& .MuiTypography-caption": {
-          bottom: "5px"
         }
       }
     },
     "& .MuiAccordionDetails-root": {
-      backgroundColor: fade(theme.palette.common.black, .12)
+      backgroundColor: fade(theme.palette.common.black, .12),
+      padding: "16px 12px",
+      display: "block",
+      "& > div:first-of-type": {
+        "& > div:nth-of-type(2)": {
+          margin: "16px 0 0 0"
+        }
+      },
+      "& .string-options-container": {
+        "& > div": {
+          margin: "16px 0 0 0"
+        },
+        "& > div:nth-of-type(3)": {
+          [theme.breakpoints.up(theme.breakpoints.values.sm)]:{
+            padding: "0 8px 0 0"
+          }
+          
+        },
+        "& > div:nth-of-type(4)": {
+          [theme.breakpoints.up(theme.breakpoints.values.sm)]:{
+            padding: "0 0 0 8px"
+          }
+        }
+      },
+      "& .number-options-container": {
+        "& > div": {
+          margin: "16px 0 0 0"
+        },
+        "& > div:nth-of-type(2)": {
+          [theme.breakpoints.up(theme.breakpoints.values.sm)]:{
+            padding: "0 8px 0 0"
+          }
+          
+        },
+        "& > div:nth-of-type(3)": {
+          [theme.breakpoints.up(theme.breakpoints.values.sm)]:{
+            padding: "0 0 0 8px"
+          }
+        }
+      }
     }
   }
 }));
@@ -132,10 +167,11 @@ interface BlueprintField{
   isRequired?: boolean;
   isInteger?: boolean;
   regex?: string;
-  min?: number;
-  max?: number;
+  min?: number | string;
+  max?: number | string;
   arrayOf?: BlueprintField;
   fields?: BlueprintField[];
+  error?: string;
 };
 
 interface CreateBlueprintProps{
@@ -150,6 +186,7 @@ const CreateBlueprint = (props: CreateBlueprintProps) => {
   const [blueprintName, setBlueprintName] = useState({value: "", error: ""});
   const [blueprintTree, setBlueprintTree] = useState([]); // the tree structure of the blueprint's fields.
   const [blueprintValueMap, setBlueprintValueMap] = useState({}); // the values of each tree node.
+  
   const blueprintNameProps = {
     label: "Blueprint Name",
     value: blueprintName.value,
@@ -161,32 +198,43 @@ const CreateBlueprint = (props: CreateBlueprintProps) => {
     error: !!blueprintName.error,
     helperText: blueprintName.error
   };
+
+  const updateFieldProperty = (uuid: string, keyName: string, value: any) => setBlueprintValueMap({
+    ...blueprintValueMap,
+    [uuid]: {
+      ...blueprintValueMap[uuid],
+      [keyName]: value
+    }
+  });
+
+  const fieldNameProps = (uuid: string) => ({
+    label: "Field Name",
+    value: blueprintValueMap[uuid].name,
+    variant: "filled" as "filled",
+    fullWidth: true,
+    required: true,
+    error: !!blueprintValueMap[uuid].error,
+    helperText: blueprintValueMap[uuid].error,
+    onChange: (event: any) => updateFieldProperty(uuid, "name", event.target.value)
+  });
+
   const onSave = async(event: any) => {
     const response: any = await props.createBlueprint(blueprintName.value);
     if(/^name /.test(response.error) && !/ field /.test(response.error))
       return setBlueprintName({...blueprintName, error: response.error});
   };
+
   const addNewField = (fieldName: string, fieldType: string) => {
-    /*
-      API currently supports the following properties for a field:
-      type*
-      name*
-      isRequired (all)
-      isInteger (numbers)
-      regex (strings)
-      min (string/number/array)
-      max (string/number/array)
-      arrayOf (array)
-      fields (object)
-    */
     const uuid = uuidv4();
-    let field: BlueprintField = {name: fieldName, type: fieldType, isRequired: false, isExpanded: true};
+    // Lets default the accordion to collapsed...except for Arrays and Objects...since those are garunteed to need additional data.
+    const isArrayOrObject = fieldType.toLowerCase() === "array" || fieldType.toLowerCase() === "object";
+    let field: BlueprintField = {name: fieldName, type: fieldType, isRequired: false, isExpanded: isArrayOrObject ? true : false};
     switch(fieldType.toLowerCase()){
-      case "string": field = {...field, regex: null, min: null, max: null};
+      case "string": field = {...field, regex: "", min: "", max: ""};
                      break;
-      case "number": field = {...field, isInteger: false, min: null, max: null};
+      case "number": field = {...field, isInteger: false, min: "", max: ""};
                      break;
-      case "array":  field = {...field, min: null, max: null, arrayOf: null};
+      case "array":  field = {...field, min: "", max: "", arrayOf: null};
                      break;
       case "object": field = {...field, fields: []};
                      break;
@@ -207,29 +255,126 @@ const CreateBlueprint = (props: CreateBlueprintProps) => {
     }
   });
 
+  const renderFieldOptions = (uuid) => {
+    const fieldData = blueprintValueMap[uuid];
+    const regexProps = {
+      label: "Regex Pattern",
+      value: fieldData.regex,
+      variant: "filled" as "filled",
+      fullWidth: true,
+      onChange: (event: any) => updateFieldProperty(uuid, "regex", event.target.value),
+      helperText: "Example: ^hello, world$"
+    };
+    const minProps = {
+      value: fieldData.min,
+      variant: "filled" as "filled",
+      fullWidth: true,
+      type: "number"
+    };
+    const maxProps = {
+      value: fieldData.max,
+      variant: "filled" as "filled",
+      fullWidth: true,
+      type: "number"
+    };
+    switch(fieldData.type){
+      case "STRING":
+        return (
+          <>
+            <Grid item xs={12} sm={6} md={5}>
+              <TextField {...regexProps} />
+            </Grid>
+            <Grid item xs={false} sm={6} md={7}></Grid>
+            <Grid item xs={12} sm={3}>
+              <TextField {...minProps} label="Min Length" onChange={(event: any) => {
+                const value = event.target.value;
+                if(!isNaN(value) && value < 0)
+                  return;
+                updateFieldProperty(uuid, "min", event.target.value);
+              }}/>
+            </Grid>
+            <Grid item xs={12} sm={3}>
+              <TextField {...maxProps} label="Max Length" onChange={(event: any) => {
+                const value = event.target.value;
+                if(!isNaN(value) && value < 0)
+                  return;
+                updateFieldProperty(uuid, "max", event.target.value);
+              }}/>
+            </Grid>
+          </>
+        );
+      case "NUMBER":
+        return (
+          <>
+            <Grid item xs={12}>
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={fieldData.isInteger}
+                    onChange={(event: any) => updateFieldProperty(uuid, "isInteger", event.target.checked)}
+                    name={`${uuid}-integer`}
+                    color="primary"
+                  />
+                }
+                label="Integer Values Only"
+              />
+            </Grid>
+            <Grid item xs={12} sm={3}>
+              <TextField {...minProps} label="Min Value" onChange={(event: any) => updateFieldProperty(uuid, "min", event.target.value)}/>
+            </Grid>
+            <Grid item xs={12} sm={3}>
+              <TextField {...maxProps} label="Max Value" onChange={(event: any) => updateFieldProperty(uuid, "max", event.target.value)}/>
+            </Grid>
+          </>
+        );
+      default:
+        return null;
+    }
+  };
+
   const renderFields = () => blueprintTree.map((field, index) => {
     const {uuid} = field;
     const fieldData = blueprintValueMap[uuid];
     const {isExpanded} = fieldData;
     return (
-      <Accordion elevation={isExpanded ? 5 : 1} key={index} className={classes.accordionRoot} TransitionProps={{ unmountOnExit: true }} expanded={isExpanded} onChange={toggleAccordion(uuid)}>
+      <Accordion elevation={isExpanded ? 5 : 1} key={index} className={classes.accordionRoot} TransitionProps={{unmountOnExit: true}} expanded={isExpanded} onChange={toggleAccordion(uuid)}>
         <AccordionSummary aria-controls={`${field.uuid}-content`} id={`${field.uuid}-header`} expandIcon={<FontAwesomeIcon icon={faChevronDown} fixedWidth size="sm" />}>
           <Grid container>
             <Grid item xs={12}>
               <Typography variant="subtitle1" component="div">{fieldData.name}</Typography>
+            </Grid>
+            <Grid item xs={12}>
               <Typography variant="caption" component="div">{fieldData.type}</Typography>
             </Grid>
           </Grid>
         </AccordionSummary>
         <AccordionDetails>
-          <Typography>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse malesuada lacus ex,
-            sit amet blandit leo lobortis eget.
-          </Typography>
+          <Grid container>
+            <Grid item xs={12}>
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={fieldData.isRequired}
+                    onChange={(event: any) => updateFieldProperty(uuid, "isRequired", event.target.checked)}
+                    name={`${uuid}-required`}
+                    color="primary"
+                  />
+                }
+                label="Required Field"
+              />
+            </Grid>
+            <Grid item xs={12} sm={6} md={5}>
+              <TextField {...fieldNameProps(uuid)} />
+            </Grid>
+          </Grid>
+          <Grid container className={`${fieldData.type.toLowerCase()}-options-container`}>
+            {renderFieldOptions(uuid)}
+          </Grid>
         </AccordionDetails>
       </Accordion>
     );
   });
+
   return (
     <>
       <Head>
@@ -270,7 +415,11 @@ const CreateBlueprint = (props: CreateBlueprintProps) => {
           </Grid>
         </Grid>
         {blueprintTree.length ? (
-          renderFields()
+          <>
+            <Typography variant="h6" component="h6">Fields</Typography>
+            <Divider />
+            {renderFields()}
+          </>
         ) : (
           <Box boxShadow={0} className={classes.fieldsEmptyContainer}>
             <Typography variant="subtitle1" component="div">
