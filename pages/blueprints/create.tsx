@@ -19,13 +19,32 @@ import { fade } from "@material-ui/core/styles/colorManipulator";
 import { createBlueprint } from "../../src/store/actions/blueprints";
 import Collapse from "@material-ui/core/Collapse";
 import Grid from "@material-ui/core/Grid";
-import { v4 as uuidv4 } from 'uuid';
-import Accordion from '@material-ui/core/Accordion';
-import AccordionSummary from '@material-ui/core/AccordionSummary';
-import AccordionDetails from '@material-ui/core/AccordionDetails';
+import { v4 as uuidv4 } from "uuid";
+import Accordion from "@material-ui/core/Accordion";
+import AccordionSummary from "@material-ui/core/AccordionSummary";
+import AccordionDetails from "@material-ui/core/AccordionDetails";
 import FormControlLabel from "@material-ui/core/FormControlLabel/FormControlLabel";
-import Switch from '@material-ui/core/Switch';
+import Switch from "@material-ui/core/Switch";
+import Breadcrumbs from "@material-ui/core/Breadcrumbs";
 
+/**
+ * This is the design path forward:
+ * 
+ * NO NESTED ACCORDIONS. It becomes a nightmare for us since objects can be infinitely nested.
+ * 
+ * Make the "Fields" section more dynamic. at the top have a breadcrumb trail (starting at "root").
+ * When viewing arrayOf or nested-fields, update the breadcrumb and render a new set of accordions..
+ * 
+ * This will allow the user to keep browsing all the nested data while also keeping track of where they are
+ * inside of the tree, allowing them to jump back to any node along the breadcrumb trail.
+ */
+
+/**
+ * RUNNING TODO LIST:
+ * 1. API does not allow Array's arrayOf value to contain an array-type. We shouldnt allow the user to select Array as an arrayOf type.
+ * 2. Functionality to REMOVE a field/arrayOf value.
+ * 
+ */
 const useStyles = makeStyles((theme: Theme) => ({
   container: {
     marginTop: "0",
@@ -107,6 +126,9 @@ const useStyles = makeStyles((theme: Theme) => ({
           maxWidth: "275px"
         }
       },
+      "& .MuiTypography-caption": {
+        fontStyle: "italic"
+      },
       "&.Mui-expanded": {
         color: theme.palette.common.white,
         backgroundColor: theme.palette.primary.main,
@@ -124,6 +146,7 @@ const useStyles = makeStyles((theme: Theme) => ({
           margin: "16px 0 0 0"
         }
       },
+
       "& .string-options-container": {
         "& > div": {
           margin: "16px 0 0 0"
@@ -140,6 +163,7 @@ const useStyles = makeStyles((theme: Theme) => ({
           }
         }
       },
+
       "& .number-options-container": {
         "& > div": {
           margin: "16px 0 0 0"
@@ -155,7 +179,42 @@ const useStyles = makeStyles((theme: Theme) => ({
             padding: "0 0 0 8px"
           }
         }
+      },
+      "& .array-options-container": {
+        "& > div": {
+          margin: "16px 0 0 0",
+          "&:nth-of-type(1)": {
+            [theme.breakpoints.up(theme.breakpoints.values.sm)]:{
+              padding: "0 8px 0 0" 
+            }
+          },
+          "&:nth-of-type(2)": {
+            [theme.breakpoints.up(theme.breakpoints.values.sm)]:{
+              padding: "0 0 0 8px"
+            }
+          }
+        }
+      },
+      "& .object-options-container": {
+        "& > div": {
+          margin: "16px 0 0 0"
+        }
       }
+    }
+  },
+  breadcrumbs: {
+    margin: "8px 0 0 0",
+    "& .breadcrumbLink": {
+      textDecoration: "none",
+      color: fade(theme.palette.common.black, .54),
+      "&:hover, &:focus": {
+        textDecoration: "underline",
+        color: fade(theme.palette.common.black, .54)
+      }
+    },
+    "& .breadcrumbActive": {
+      fontWeight: "bold",
+      color: fade(theme.palette.common.black, .75)
     }
   }
 }));
@@ -172,6 +231,7 @@ interface BlueprintField{
   arrayOf?: BlueprintField;
   fields?: BlueprintField[];
   error?: string;
+  parent?: string;
 };
 
 interface CreateBlueprintProps{
@@ -184,9 +244,10 @@ const CreateBlueprint = (props: CreateBlueprintProps) => {
   const [modalOpen, setModalOpen] = useState(false);
   const [showActions, setShowActions] = useState(true);
   const [blueprintName, setBlueprintName] = useState({value: "", error: ""});
-  const [blueprintTree, setBlueprintTree] = useState([]); // the tree structure of the blueprint's fields.
+  const [blueprintTreeRoot, setBlueprintTreeRoot] = useState([]);
   const [blueprintValueMap, setBlueprintValueMap] = useState({}); // the values of each tree node.
-  
+  const [fieldBreadcrumbs, setFieldBreadcrumbs] = useState([]); // breadcrumb structure: {uuid: STRING, name: STRING}
+
   const blueprintNameProps = {
     label: "Blueprint Name",
     value: blueprintName.value,
@@ -227,24 +288,55 @@ const CreateBlueprint = (props: CreateBlueprintProps) => {
   const addNewField = (fieldName: string, fieldType: string) => {
     const uuid = uuidv4();
     // Lets default the accordion to collapsed...except for Arrays and Objects...since those are garunteed to need additional data.
-    const isArrayOrObject = fieldType.toLowerCase() === "array" || fieldType.toLowerCase() === "object";
-    let field: BlueprintField = {name: fieldName, type: fieldType, isRequired: false, isExpanded: isArrayOrObject ? true : false};
-    switch(fieldType.toLowerCase()){
-      case "string": field = {...field, regex: "", min: "", max: ""};
+    let field: BlueprintField = {name: fieldName, type: fieldType, isRequired: false, isExpanded: true};
+    switch(fieldType){
+      case "STRING": field = {...field, regex: "", min: "", max: ""};
                      break;
-      case "number": field = {...field, isInteger: false, min: "", max: ""};
+      case "NUMBER": field = {...field, isInteger: false, min: "", max: ""};
                      break;
-      case "array":  field = {...field, min: "", max: "", arrayOf: null};
+      case "ARRAY":  field = {...field, min: "", max: "", arrayOf: null};
                      break;
-      case "object": field = {...field, fields: []};
+      case "OBJECT": field = {...field, fields: []};
                      break;
       default: break;
     }
-    setBlueprintTree([...blueprintTree, {uuid}]);
-    setBlueprintValueMap({
-      ...blueprintValueMap,
-      [uuid]: field
-    });
+
+    if(fieldBreadcrumbs.length)
+      field.parent = fieldBreadcrumbs[fieldBreadcrumbs.length-1].uuid;
+    
+    // if we are at the root level, update the blueprintTreeRoot state.
+    if(!fieldBreadcrumbs.length)
+      setBlueprintTreeRoot([...blueprintTreeRoot, {uuid}]);
+
+    const newBlueprintValueMap = {...blueprintValueMap, [uuid]: field};
+    // update arrayOf/fields of the parent node, if present.
+    if(fieldBreadcrumbs.length){
+      const parentId = fieldBreadcrumbs[fieldBreadcrumbs.length-1].uuid;
+      const parentData = newBlueprintValueMap[parentId];
+      parentData.type === "ARRAY" ? (
+        newBlueprintValueMap[parentId].arrayOf = uuid
+      ) : (
+        newBlueprintValueMap[parentId].fields = [...parentData.fields, uuid]
+      );
+    }
+    setBlueprintValueMap(newBlueprintValueMap);
+  };
+
+  const getFields = () => {
+    let result = [];
+    // if breadcrumbs is empty, return the root of the tree.
+    if(!fieldBreadcrumbs.length)
+      return blueprintTreeRoot;
+    
+    // otherwise return the fields of the last breadcrumb item.
+    const uuid = fieldBreadcrumbs[fieldBreadcrumbs.length-1].uuid;
+    const fieldData = blueprintValueMap[uuid];
+    if(fieldData.type === "ARRAY")
+      result = fieldData.arrayOf ? [{uuid: fieldData.arrayOf}] : [];
+    else
+      result = fieldData.fields.map(fieldId => ({uuid: fieldId}));
+
+    return result;
   };
 
   const toggleAccordion = (uuid: string) => (event: any, isExpanded: boolean) => setBlueprintValueMap({
@@ -253,6 +345,112 @@ const CreateBlueprint = (props: CreateBlueprintProps) => {
       ...blueprintValueMap[uuid],
       isExpanded: !blueprintValueMap[uuid].isExpanded
     }
+  });
+
+  const renderEmptyMessage = () => {
+    if(!fieldBreadcrumbs.length)
+      return "This blueprint currently has no fields."
+
+    const uuid = fieldBreadcrumbs[fieldBreadcrumbs.length-1].uuid;
+    const fieldData = blueprintValueMap[uuid];
+    return fieldData.type === "ARRAY" ? (
+      "This array contains no arrayOf data."
+    ) : (
+      "This object currently has no fields."
+    );
+  };
+
+  const renderSubtitle = () => {
+    if(!fieldBreadcrumbs.length)
+      return "Fields";
+
+    const uuid = fieldBreadcrumbs[fieldBreadcrumbs.length-1].uuid;
+    const fieldData = blueprintValueMap[uuid];
+    return fieldData.type === "ARRAY" ? "Array Of": "Fields";
+  };
+
+  const generateBreadcrumbPath = (uuid: string) => {
+    const fieldData = blueprintValueMap[uuid];
+    let parent = fieldData.parent;
+    let breadcrumbs = [{uuid: uuid, name: fieldData.name}];
+    while(parent){
+      const parentData = blueprintValueMap[parent];
+      breadcrumbs = [...breadcrumbs, {uuid: parent, name: parentData.name}];
+      parent = parentData.parent;
+    }
+    return breadcrumbs.reverse();
+  }
+
+  const onBreadcrumbClick = (uuid: string) => (event: any) => {
+    event.preventDefault();
+    if(uuid === "root")
+      return setFieldBreadcrumbs([]);
+
+    setFieldBreadcrumbs(generateBreadcrumbPath(uuid));
+  };
+
+  const renderBreadcrumbs = () => {
+    if(!fieldBreadcrumbs.length)
+      return null;
+    const breadcrumbs = [{uuid: "root", name: "root"}, ...fieldBreadcrumbs];
+    return (
+      <Breadcrumbs aria-label="field-breadcrumbs" className={classes.breadcrumbs}>
+        {breadcrumbs.map((breadcrumb, index) => (
+          index === breadcrumbs.length-1 ? (
+            <Typography key={index} variant="caption" component="span" onClick={onBreadcrumbClick(breadcrumb.uuid)} className="breadcrumbActive">
+              {breadcrumb.name}
+            </Typography>
+          ) : (
+            <Typography key={index} variant="caption" component="a" href="#" onClick={onBreadcrumbClick(breadcrumb.uuid)} className="breadcrumbLink">
+              {breadcrumb.name}
+            </Typography>
+          )
+        ))}
+      </Breadcrumbs>
+    );
+  };
+
+  const renderFields = () => getFields().map((field, index) => {
+    const {uuid} = field;
+    const fieldData = blueprintValueMap[uuid];
+    const {isExpanded} = fieldData;
+    return (
+      <Accordion elevation={isExpanded ? 5 : 1} key={index} className={classes.accordionRoot} TransitionProps={{unmountOnExit: true}} expanded={isExpanded} onChange={toggleAccordion(uuid)}>
+        <AccordionSummary aria-controls={`${field.uuid}-content`} id={`${field.uuid}-header`} expandIcon={<FontAwesomeIcon icon={faChevronDown} fixedWidth size="sm" />}>
+          <Grid container>
+            <Grid item xs={12}>
+              <Typography variant="subtitle1" component="div">{fieldData.name}</Typography>
+            </Grid>
+            <Grid item xs={12}>
+              <Typography variant="caption" component="div">{fieldData.type}</Typography>
+            </Grid>
+          </Grid>
+        </AccordionSummary>
+        <AccordionDetails>
+          <Grid container>
+            <Grid item xs={12}>
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={fieldData.isRequired}
+                    onChange={(event: any) => updateFieldProperty(uuid, "isRequired", event.target.checked)}
+                    name={`${uuid}-required`}
+                    color="primary"
+                  />
+                }
+                label="Required Field"
+              />
+            </Grid>
+            <Grid item xs={12} sm={6} md={5}>
+              <TextField {...fieldNameProps(uuid)} />
+            </Grid>
+          </Grid>
+          <Grid container className={`${fieldData.type.toLowerCase()}-options-container`}>
+            {renderFieldOptions(uuid)}
+          </Grid>
+        </AccordionDetails>
+      </Accordion>
+    );
   });
 
   const renderFieldOptions = (uuid) => {
@@ -327,53 +525,46 @@ const CreateBlueprint = (props: CreateBlueprintProps) => {
             </Grid>
           </>
         );
+      case "ARRAY":
+        return (
+          <>
+            <Grid item xs={12} sm={3}>
+              <TextField {...minProps} label="Min Length" onChange={(event: any) => {
+                const value = event.target.value;
+                if(!isNaN(value) && value < 0)
+                  return;
+                updateFieldProperty(uuid, "min", event.target.value);
+              }}/>
+            </Grid>
+            <Grid item xs={12} sm={3}>
+              <TextField {...maxProps} label="Max Length" onChange={(event: any) => {
+                const value = event.target.value;
+                if(!isNaN(value) && value < 0)
+                  return;
+                updateFieldProperty(uuid, "max", event.target.value);
+              }}/>
+            </Grid>
+            {/* Placeholder grid item to push other options to a new row. */}
+            <Grid item xs={false} sm={6}></Grid> 
+            <Grid item xs={12} sm={6} md={3}>
+              <Button fullWidth color="primary" variant="contained" onClick={() => setFieldBreadcrumbs([...fieldBreadcrumbs, {uuid, name: fieldData.name}])}>
+                Manage Content
+              </Button>
+            </Grid>
+          </>
+        );
+      case "OBJECT":
+        return (
+          <Grid item xs={12} sm={6} md={3}>
+            <Button fullWidth color="primary" variant="contained" onClick={() => setFieldBreadcrumbs([...fieldBreadcrumbs, {uuid, name: fieldData.name}])}>
+              Manage Content
+            </Button>
+          </Grid>
+        );
       default:
         return null;
     }
   };
-
-  const renderFields = () => blueprintTree.map((field, index) => {
-    const {uuid} = field;
-    const fieldData = blueprintValueMap[uuid];
-    const {isExpanded} = fieldData;
-    return (
-      <Accordion elevation={isExpanded ? 5 : 1} key={index} className={classes.accordionRoot} TransitionProps={{unmountOnExit: true}} expanded={isExpanded} onChange={toggleAccordion(uuid)}>
-        <AccordionSummary aria-controls={`${field.uuid}-content`} id={`${field.uuid}-header`} expandIcon={<FontAwesomeIcon icon={faChevronDown} fixedWidth size="sm" />}>
-          <Grid container>
-            <Grid item xs={12}>
-              <Typography variant="subtitle1" component="div">{fieldData.name}</Typography>
-            </Grid>
-            <Grid item xs={12}>
-              <Typography variant="caption" component="div">{fieldData.type}</Typography>
-            </Grid>
-          </Grid>
-        </AccordionSummary>
-        <AccordionDetails>
-          <Grid container>
-            <Grid item xs={12}>
-              <FormControlLabel
-                control={
-                  <Switch
-                    checked={fieldData.isRequired}
-                    onChange={(event: any) => updateFieldProperty(uuid, "isRequired", event.target.checked)}
-                    name={`${uuid}-required`}
-                    color="primary"
-                  />
-                }
-                label="Required Field"
-              />
-            </Grid>
-            <Grid item xs={12} sm={6} md={5}>
-              <TextField {...fieldNameProps(uuid)} />
-            </Grid>
-          </Grid>
-          <Grid container className={`${fieldData.type.toLowerCase()}-options-container`}>
-            {renderFieldOptions(uuid)}
-          </Grid>
-        </AccordionDetails>
-      </Accordion>
-    );
-  });
 
   return (
     <>
@@ -414,16 +605,17 @@ const CreateBlueprint = (props: CreateBlueprintProps) => {
             <TextField {...blueprintNameProps} />
           </Grid>
         </Grid>
-        {blueprintTree.length ? (
+        <Typography variant="h6" component="h6">{renderSubtitle()}</Typography>
+        <Divider />
+        {renderBreadcrumbs()}
+        {getFields().length ? (
           <>
-            <Typography variant="h6" component="h6">Fields</Typography>
-            <Divider />
             {renderFields()}
           </>
         ) : (
           <Box boxShadow={0} className={classes.fieldsEmptyContainer}>
             <Typography variant="subtitle1" component="div">
-              This blueprint currently has no fields.
+              {renderEmptyMessage()}
             </Typography>
           </Box>
         )}
