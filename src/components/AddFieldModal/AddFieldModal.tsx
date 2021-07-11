@@ -25,14 +25,16 @@ const AddFieldModal = (props: AddFieldModalProps) => {
     props.handleClose();
   };
 
-  const fieldTypes = [
+  let fieldTypes = [
     "String",
     "Boolean",
     "Number",
     "Date",
-    "Array",
     "Object"
   ];
+
+  if(!props.parent || props.parent && props.parent.type !== "ARRAY")
+    fieldTypes = fieldTypes.concat("Array");
 
   const nameInputProps = {
     label: "Field Name",

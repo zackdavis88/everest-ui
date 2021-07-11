@@ -13,7 +13,7 @@ import { RootState } from "../../src/store/store";
 import { GetServerSideProps } from "next";
 import AddFieldModal from "../../src/components/AddFieldModal/AddFieldModal";
 import Box from "@material-ui/core/Box";
-import { faPlus, faSave, faTimes, faChevronDown } from "@fortawesome/free-solid-svg-icons";
+import { faPlus, faSave, faChevronDown, faArrowLeft, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { fade } from "@material-ui/core/styles/colorManipulator";
 import { createBlueprint } from "../../src/store/actions/blueprints";
@@ -26,6 +26,7 @@ import AccordionDetails from "@material-ui/core/AccordionDetails";
 import FormControlLabel from "@material-ui/core/FormControlLabel/FormControlLabel";
 import Switch from "@material-ui/core/Switch";
 import Breadcrumbs from "@material-ui/core/Breadcrumbs";
+import { useRouter } from "next/router";
 
 /**
  * This is the design path forward:
@@ -37,13 +38,8 @@ import Breadcrumbs from "@material-ui/core/Breadcrumbs";
  * 
  * This will allow the user to keep browsing all the nested data while also keeping track of where they are
  * inside of the tree, allowing them to jump back to any node along the breadcrumb trail.
- */
-
-/**
- * RUNNING TODO LIST:
- * 1. API does not allow Array's arrayOf value to contain an array-type. We shouldnt allow the user to select Array as an arrayOf type.
- * 2. Functionality to REMOVE a field/arrayOf value.
  * 
+ * It's not the perfect user experience but its good enough for an MVP.
  */
 const useStyles = makeStyles((theme: Theme) => ({
   container: {
@@ -143,6 +139,9 @@ const useStyles = makeStyles((theme: Theme) => ({
       display: "block",
       "& > div:first-of-type": {
         "& > div:nth-of-type(2)": {
+          textAlign: "right"
+        },
+        "& > div:nth-of-type(3)": {
           margin: "16px 0 0 0"
         }
       },
@@ -219,7 +218,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   }
 }));
 
-interface BlueprintField{
+export interface BlueprintField{
   name: string;
   type: string;
   isExpanded: boolean;
@@ -241,6 +240,7 @@ interface CreateBlueprintProps{
 
 const CreateBlueprint = (props: CreateBlueprintProps) => {
   const classes = useStyles();
+  const router = useRouter();
   const [modalOpen, setModalOpen] = useState(false);
   const [showActions, setShowActions] = useState(true);
   const [blueprintName, setBlueprintName] = useState({value: "", error: ""});
@@ -322,6 +322,37 @@ const CreateBlueprint = (props: CreateBlueprintProps) => {
     setBlueprintValueMap(newBlueprintValueMap);
   };
 
+  // NOTE: This will leave any children of the field orphaned inside of the valueMap...thats probably fine
+  // but _could_ be a source of performance issues in the future. Consider a full cleanup of the valueMap.
+  const removeField = (uuid: string) => (event: any) => {
+    const newValueMap = {...blueprintValueMap};
+    const parentId = newValueMap[uuid].parent;
+    const parentData = newValueMap[parentId];
+
+    // If there is a parent, remove the reference to the uuid being removed.
+    if(parentId){
+      if(parentData.type === "ARRAY")
+        newValueMap[parentId].arrayOf = null;
+      else if(parentData.type === "OBJECT")
+        newValueMap[parentId].fields = parentData.fields.filter((fieldId) => fieldId !== uuid);
+    }
+    // If there is no parent, then remove the field from the treeRoot
+    else
+      setBlueprintTreeRoot(blueprintTreeRoot.filter(treeNode => treeNode.uuid !== uuid));
+
+    // Remove the field data from the value map.
+    delete newValueMap[uuid];
+    setBlueprintValueMap(newValueMap);
+  };
+
+  const getLastBreadcrumbValue = () => {
+    if(!fieldBreadcrumbs.length)
+      return null;
+
+    const uuid = fieldBreadcrumbs[fieldBreadcrumbs.length-1].uuid;
+    return blueprintValueMap[uuid];
+  };
+
   const getFields = () => {
     let result = [];
     // if breadcrumbs is empty, return the root of the tree.
@@ -329,8 +360,7 @@ const CreateBlueprint = (props: CreateBlueprintProps) => {
       return blueprintTreeRoot;
     
     // otherwise return the fields of the last breadcrumb item.
-    const uuid = fieldBreadcrumbs[fieldBreadcrumbs.length-1].uuid;
-    const fieldData = blueprintValueMap[uuid];
+    const fieldData = getLastBreadcrumbValue();
     if(fieldData.type === "ARRAY")
       result = fieldData.arrayOf ? [{uuid: fieldData.arrayOf}] : [];
     else
@@ -351,8 +381,7 @@ const CreateBlueprint = (props: CreateBlueprintProps) => {
     if(!fieldBreadcrumbs.length)
       return "This blueprint currently has no fields."
 
-    const uuid = fieldBreadcrumbs[fieldBreadcrumbs.length-1].uuid;
-    const fieldData = blueprintValueMap[uuid];
+    const fieldData = getLastBreadcrumbValue();
     return fieldData.type === "ARRAY" ? (
       "This array contains no arrayOf data."
     ) : (
@@ -364,8 +393,7 @@ const CreateBlueprint = (props: CreateBlueprintProps) => {
     if(!fieldBreadcrumbs.length)
       return "Fields";
 
-    const uuid = fieldBreadcrumbs[fieldBreadcrumbs.length-1].uuid;
-    const fieldData = blueprintValueMap[uuid];
+    const fieldData = getLastBreadcrumbValue();
     return fieldData.type === "ARRAY" ? "Array Of": "Fields";
   };
 
@@ -428,7 +456,7 @@ const CreateBlueprint = (props: CreateBlueprintProps) => {
         </AccordionSummary>
         <AccordionDetails>
           <Grid container>
-            <Grid item xs={12}>
+            <Grid item xs={7}>
               <FormControlLabel
                 control={
                   <Switch
@@ -440,6 +468,11 @@ const CreateBlueprint = (props: CreateBlueprintProps) => {
                 }
                 label="Required Field"
               />
+            </Grid>
+            <Grid item xs={5}>
+              <Button size="small" variant="outlined" color="primary" startIcon={<FontAwesomeIcon icon={faTrash} fixedWidth/>} onClick={removeField(uuid)}>
+                Remove
+              </Button>
             </Grid>
             <Grid item xs={12} sm={6} md={5}>
               <TextField {...fieldNameProps(uuid)} />
@@ -582,18 +615,18 @@ const CreateBlueprint = (props: CreateBlueprintProps) => {
             <Box boxShadow={0} className={classes.actionsMenu}>
               <Grid container spacing={1}>
                 <Grid item lg={3} md={3} sm={4} xs={12}>
-                  <Button size="medium" variant="contained" color="primary" fullWidth startIcon={<FontAwesomeIcon icon={faSave} fixedWidth size="xs" />} onClick={onSave}>
+                  <Button variant="contained" color="primary" fullWidth startIcon={<FontAwesomeIcon icon={faSave} fixedWidth size="xs" />} onClick={onSave}>
                     Save
                   </Button>
                 </Grid>
                 <Grid item lg={3} md={3} sm={4} xs={12}>
-                  <Button size="medium" variant="outlined" color="primary" fullWidth startIcon={<FontAwesomeIcon icon={faTimes} fixedWidth size="xs" />}>
-                    Cancel
+                  <Button variant="outlined" fullWidth color="primary" startIcon={<FontAwesomeIcon icon={faPlus} fixedWidth size="xs" />} onClick={() => setModalOpen(true)}>
+                    Add Field
                   </Button>
                 </Grid>
                 <Grid item lg={3} md={3} sm={4} xs={12}>
-                  <Button size="medium" variant="outlined" fullWidth color="primary" startIcon={<FontAwesomeIcon icon={faPlus} fixedWidth size="xs" />} onClick={() => setModalOpen(true)}>
-                    Add Field
+                  <Button variant="outlined" color="primary" fullWidth startIcon={<FontAwesomeIcon icon={faArrowLeft} fixedWidth size="xs" />} onClick={() => router.push("/blueprints")}>
+                    Back
                   </Button>
                 </Grid>
               </Grid>
@@ -624,6 +657,7 @@ const CreateBlueprint = (props: CreateBlueprintProps) => {
         isOpen={modalOpen}
         handleClose={() => setModalOpen(false)}
         onSubmit={addNewField}
+        parent={getLastBreadcrumbValue()}
       />
     </>
   );
