@@ -23,13 +23,14 @@ export const deleteBlueprint = (id: string, confirmInput: string) => dispatch =>
 });
 
 
-export const createBlueprint = (name: string) => dispatch => dispatch({
+export const createBlueprint = (name: string, fields: any) => dispatch => dispatch({
   types: ["BLUEPRINT_REQUEST_NO_OP", "BLUEPRINT_SUCCESS_NO_OP", "BLUEPRINT_FAILURE_NO_OP"],
   reqUrl: "/api/blueprints",
   reqOptions: {
     method: "POST"
   },
   payload: {
-    name
+    name,
+    fields
   }
 });

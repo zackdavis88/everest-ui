@@ -98,7 +98,7 @@ const LoginForm = (props: LoginFormProps) => {
           <form noValidate autoComplete="off" className={classes.form} onSubmit={onSubmit}>
             <TextField variant="filled" {...usernameField} />
             <TextField variant="filled" {...passwordField} />
-            <Grid container spacing={2} justify="center">
+            <Grid container spacing={2} justifyContent="center">
               <Grid item xs={12} sm={6}>
                 <Button className={classes.button} variant="contained" size="large"  type="submit" fullWidth color="primary" startIcon={<FontAwesomeIcon icon={faSignInAlt} fixedWidth />} disabled={submitDisabled()}>
                   Login

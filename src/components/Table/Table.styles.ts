@@ -1,5 +1,5 @@
 import { Theme } from "@material-ui/core/styles"
-import { fade } from "@material-ui/core/styles/colorManipulator";
+import { alpha } from "@material-ui/core/styles/colorManipulator";
 import makeStyles from "@material-ui/core/styles/makeStyles";
 
 export const useStyles = makeStyles((theme: Theme) => ({
@@ -29,7 +29,7 @@ export const useStyles = makeStyles((theme: Theme) => ({
       height: "100%",
       position: "absolute",
       zIndex: 100,
-      backgroundColor: fade(theme.palette.common.white, 0.4)
+      backgroundColor: alpha(theme.palette.common.white, 0.4)
     },
     [theme.breakpoints.down(theme.breakpoints.values.md)]: {
       "& .hidden-md": {

@@ -144,7 +144,7 @@ const SignUpForm = (props: SignUpFormProps) => {
             <TextField variant="filled" {...usernameField} />
             <TextField variant="filled" {...passwordField} />
             <TextField variant="filled" {...confirmField} />
-            <Grid container spacing={2} justify="center">
+            <Grid container spacing={2} justifyContent="center">
               <Grid item xs={12} sm={6}>
                 <Button className={classes.button} variant="contained" size="large"  type="submit" fullWidth color="primary" startIcon={<FontAwesomeIcon icon={faUserPlus} fixedWidth />} disabled={submitDisabled()}>
                   Sign Up

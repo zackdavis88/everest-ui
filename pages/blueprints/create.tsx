@@ -15,7 +15,7 @@ import AddFieldModal from "../../src/components/AddFieldModal/AddFieldModal";
 import Box from "@material-ui/core/Box";
 import { faPlus, faSave, faChevronDown, faArrowLeft, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { fade } from "@material-ui/core/styles/colorManipulator";
+import { alpha } from "@material-ui/core/styles/colorManipulator";
 import { createBlueprint } from "../../src/store/actions/blueprints";
 import Collapse from "@material-ui/core/Collapse";
 import Grid from "@material-ui/core/Grid";
@@ -40,6 +40,11 @@ import { useRouter } from "next/router";
  * inside of the tree, allowing them to jump back to any node along the breadcrumb trail.
  * 
  * It's not the perfect user experience but its good enough for an MVP.
+ */
+
+/* RUNNING TODO LIST: (Prioritized for your pleasure)
+ * 1. All The Error Handling...pass the uuid of each field to the API...modify the API to return the uuid of any validation error...modify frontend to set error state for the uuid returned.
+ * 2. AddFieldModal is storing the selectedType as Array when adding arrayOf...make it default to falsy value in that case.
  */
 const useStyles = makeStyles((theme: Theme) => ({
   container: {
@@ -80,7 +85,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
   actionsMenu: {
     padding: "16px",
-    backgroundColor: fade(theme.palette.common.black, .12),
+    backgroundColor: alpha(theme.palette.common.black, .12),
     borderRadius: "0 0 5px 5px",
     "& button": {
         padding: "8px 22px",
@@ -107,7 +112,7 @@ const useStyles = makeStyles((theme: Theme) => ({
       }
     },
     "& > .MuiAccordionSummary-root": {
-      backgroundColor: fade(theme.palette.common.black, .12),
+      backgroundColor: alpha(theme.palette.common.black, .12),
       minHeight: 56,
       "& .MuiTypography-subtitle1": {
         maxWidth: "800px",
@@ -134,7 +139,7 @@ const useStyles = makeStyles((theme: Theme) => ({
       }
     },
     "& .MuiAccordionDetails-root": {
-      backgroundColor: fade(theme.palette.common.black, .12),
+      backgroundColor: alpha(theme.palette.common.black, .12),
       padding: "16px 12px",
       display: "block",
       "& > div:first-of-type": {
@@ -205,15 +210,15 @@ const useStyles = makeStyles((theme: Theme) => ({
     margin: "8px 0 0 0",
     "& .breadcrumbLink": {
       textDecoration: "none",
-      color: fade(theme.palette.common.black, .54),
+      color: alpha(theme.palette.common.black, .54),
       "&:hover, &:focus": {
         textDecoration: "underline",
-        color: fade(theme.palette.common.black, .54)
+        color: alpha(theme.palette.common.black, .54)
       }
     },
     "& .breadcrumbActive": {
       fontWeight: "bold",
-      color: fade(theme.palette.common.black, .75)
+      color: alpha(theme.palette.common.black, .75)
     }
   }
 }));
@@ -235,7 +240,7 @@ export interface BlueprintField{
 
 interface CreateBlueprintProps{
   initialReduxState?: RootState;
-  createBlueprint: (name: string) => void;
+  createBlueprint: (name: string, fields: any) => void;
 };
 
 const CreateBlueprint = (props: CreateBlueprintProps) => {
@@ -279,15 +284,42 @@ const CreateBlueprint = (props: CreateBlueprintProps) => {
     onChange: (event: any) => updateFieldProperty(uuid, "name", event.target.value)
   });
 
+  const generateFieldPayload = (treeNodes) => treeNodes.map(node => {
+    const { uuid } = node;
+    const fieldData = {...blueprintValueMap[uuid]};
+    if(fieldData.type === "ARRAY")
+      fieldData.arrayOf = generateFieldPayload([{uuid: fieldData.arrayOf}])[0];
+    else if(fieldData.type === "OBJECT")
+      fieldData.fields = generateFieldPayload(fieldData.fields.map(uuid => ({uuid})));
+    
+    let field: any = {
+      uuid,
+      name: fieldData.name,
+      type: fieldData.type,
+      isRequired: fieldData.isRequired
+    };
+    if(fieldData.type === "STRING")
+      field = {...field, regex: fieldData.regex, min: fieldData.min, max: fieldData.max};
+    else if(fieldData.type === "NUMBER")
+      field = {...field, isInteger: fieldData.isInteger, min: fieldData.min, max: fieldData.max};
+    else if(fieldData.type === "ARRAY")
+      field = {...field, min: fieldData.min, max: fieldData.max, arrayOf: fieldData.arrayOf};
+    else if(fieldData.type === "OBJECT")
+      field = {...field, fields: fieldData.fields};
+    
+    return field;
+  });
+
   const onSave = async(event: any) => {
-    const response: any = await props.createBlueprint(blueprintName.value);
+    const response: any = await props.createBlueprint(blueprintName.value, generateFieldPayload(blueprintTreeRoot));
     if(/^name /.test(response.error) && !/ field /.test(response.error))
       return setBlueprintName({...blueprintName, error: response.error});
+
+    console.log(response);
   };
 
   const addNewField = (fieldName: string, fieldType: string) => {
     const uuid = uuidv4();
-    // Lets default the accordion to collapsed...except for Arrays and Objects...since those are garunteed to need additional data.
     let field: BlueprintField = {name: fieldName, type: fieldType, isRequired: false, isExpanded: true};
     switch(fieldType){
       case "STRING": field = {...field, regex: "", min: "", max: ""};
@@ -407,7 +439,7 @@ const CreateBlueprint = (props: CreateBlueprintProps) => {
       parent = parentData.parent;
     }
     return breadcrumbs.reverse();
-  }
+  };
 
   const onBreadcrumbClick = (uuid: string) => (event: any) => {
     event.preventDefault();

@@ -1,5 +1,5 @@
 import {makeStyles} from "@material-ui/core";
-import { fade } from '@material-ui/core/styles/colorManipulator';
+import { alpha } from '@material-ui/core/styles/colorManipulator';
 
 export const useStyles = makeStyles((theme) => ({
   root: {
@@ -10,7 +10,7 @@ export const useStyles = makeStyles((theme) => ({
       color: "inherit",
       padding: "6px 8px",
       "&:focus": {
-        backgroundColor: fade(theme.palette.common.white, 0.1)
+        backgroundColor: alpha(theme.palette.common.white, 0.1)
       }
     }
   },

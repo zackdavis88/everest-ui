@@ -154,7 +154,7 @@ function Navbar(props: NavbarProps) {
     <>
       <AppBar position="sticky" color="primary" className={classes.appbar}>
         <Toolbar className={classes.toolbar}>
-          <Grid container alignItems="center" justify="center" className={classes.gridContainer}>
+          <Grid container alignItems="center" justifyContent="center" className={classes.gridContainer}>
             <Grid item xs={2} sm={4} lg={4} className={classes.gridItem}>
               {isAuthenticated && renderNavigation()}
             </Grid>
